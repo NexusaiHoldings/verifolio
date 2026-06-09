@@ -12,8 +12,8 @@ export type NavLink = {
 };
 
 export type NavGroup = {
-  title: string;
-  items: NavLink[];
+  label: string;
+  links: NavLink[];
 };
 
 export type NavConfig = {
@@ -31,8 +31,8 @@ const BASE_PRIMARY: NavLink[] = [
 
 const BASE_GROUPS: NavGroup[] = [
   {
-    title: "Workspace Surfaces",
-    items: [
+    label: "Workspace Surfaces",
+    links: [
       {
         label: "Work Surface",
         href: "/work",
@@ -90,8 +90,8 @@ const VERIFOLIO_PRIMARY: NavLink[] = [
 
 const VERIFOLIO_GROUPS: NavGroup[] = [
   {
-    title: "Compliance Operations",
-    items: [
+    label: "Compliance Operations",
+    links: [
       {
         label: "Dashboard",
         href: "/dashboard",
