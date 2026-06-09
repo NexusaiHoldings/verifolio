@@ -1,34 +1,18 @@
-/**
- * Top Navigation Configuration — substrate-topnav-001 (2026-05-24).
- *
- * Substrate ships with one nav entry (Home). Each portfolio company's
- * coding pipeline extends this file via F1-001 (per CTO mvp_scope —
- * cto-prompt-nav-requirement-001) to add links to the company's
- * specific feature pages.
- *
- * The substrate's TopNav component reads PRIMARY_NAV_LINKS and renders
- * them in the order declared.
- *
- * Convention:
- *   - Always keep Home as the first entry.
- *   - Group related pages with NavGroup (admin, account, etc.).
- *   - Use relative paths (Next.js route group parens collapse out of
- *     the URL — e.g. apps/web/app/(domain)/configure/page.tsx serves
- *     at /configure).
- *   - Server-only data; no client JS bundled from this file.
- */
+import type { ComponentType } from "react";
 
 export type NavLink = {
-  /** URL path (without route-group parens). */
   href: string;
-  /** Visible label. */
   label: string;
+  exact?: boolean;
+  icon?: ComponentType<{ className?: string }>;
+  badge?: {
+    label: string;
+    tone?: "neutral" | "informative" | "positive" | "warning" | "critical";
+  };
 };
 
 export type NavGroup = {
-  /** Group label (e.g. "Account", "Admin"). */
   label: string;
-  /** Child links shown inline (flat) inside the group. */
   links: NavLink[];
 };
 
@@ -37,27 +21,112 @@ export type NavConfig = {
   groups: NavGroup[];
 };
 
-/**
- * Default substrate configuration: just Home. Agents extending this
- * file should preserve Home as the first entry and append the
- * company-specific paths AFTER it.
- *
- * Example extension by F1-001:
- *   primary: [
- *     { href: "/", label: "Home" },
- *     { href: "/configure", label: "Configure" },
- *     { href: "/shop", label: "Shop" },
- *   ],
- *   groups: [
- *     { label: "Account", links: [
- *       { href: "/account/tier", label: "Tier" },
- *       { href: "/account/reorders", label: "Reorders" },
- *     ]},
- *   ],
- */
+const BASE_PRIMARY: NavLink[] = [
+  {
+    label: "Home",
+    href: "/",
+    exact: true,
+  },
+];
+
+const BASE_GROUPS: NavGroup[] = [
+  {
+    label: "Workspace Surfaces",
+    links: [
+      {
+        label: "Work Surface",
+        href: "/work",
+      },
+      {
+        label: "Conversation Surface",
+        href: "/conversation",
+      },
+      {
+        label: "Artifact Surface",
+        href: "/artifact",
+      },
+      {
+        label: "Approval Surface",
+        href: "/approval",
+      },
+      {
+        label: "Direct Surface",
+        href: "/direct",
+      },
+    ],
+  },
+];
+
+const VERIFOLIO_PRIMARY: NavLink[] = [
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+  },
+  {
+    label: "Reports",
+    href: "/reports",
+  },
+  {
+    label: "Review Queue",
+    href: "/review-queue",
+  },
+  {
+    label: "Vendors",
+    href: "/vendors",
+  },
+  {
+    label: "Properties",
+    href: "/properties",
+  },
+  {
+    label: "Certificates",
+    href: "/certificates",
+  },
+  {
+    label: "Compliance Templates",
+    href: "/compliance/templates",
+  },
+];
+
+const VERIFOLIO_GROUPS: NavGroup[] = [
+  {
+    label: "Compliance Operations",
+    links: [
+      {
+        label: "Dashboard",
+        href: "/dashboard",
+      },
+      {
+        label: "Reports",
+        href: "/reports",
+      },
+      {
+        label: "Vendors",
+        href: "/vendors",
+      },
+      {
+        label: "Properties",
+        href: "/properties",
+      },
+      {
+        label: "Certificates",
+        href: "/certificates",
+      },
+      {
+        label: "Compliance Templates",
+        href: "/compliance/templates",
+      },
+      {
+        label: "Review Queue",
+        href: "/review-queue",
+      },
+    ],
+  },
+];
+
 export const NAV_CONFIG: NavConfig = {
-  primary: [
-    { href: "/", label: "Home" },
-  ],
-  groups: [],
+  primary: [...BASE_PRIMARY, ...VERIFOLIO_PRIMARY],
+  groups: [...BASE_GROUPS, ...VERIFOLIO_GROUPS],
 };
+
+export default NAV_CONFIG;
