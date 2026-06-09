@@ -1,10 +1,8 @@
 export type NavLink = { href: string; label: string; description?: string };
 export type NavGroup = { label: string; links: NavLink[] };
+export type NavConfig = { primary: NavLink[]; groups: NavGroup[] };
 
-export const NAV_CONFIG: {
-  primary: NavLink[];
-  groups: NavGroup[];
-} = {
+export const NAV_CONFIG: NavConfig = {
   primary: [
     { label: "Home", href: "/" },
     { label: "Dashboard", href: "/dashboard" },
