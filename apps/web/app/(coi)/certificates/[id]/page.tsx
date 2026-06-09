@@ -212,8 +212,8 @@ function PropertySection({
       <FieldRow label="Effective Date" field={data.effective_date} />
       <FieldRow label="Expiration Date" field={data.expiration_date} />
       <FieldRow label="Causes of Loss" field={data.causes_of_loss} />
-      <FieldRow label="Valuation" field={data.valuation} />
-      <FieldRow label="Coinsurance" field={data.coinsurance_pct} />
+      <FieldRow label="Valuation" field={data.limits.valuation} />
+      <FieldRow label="Coinsurance" field={data.limits.coinsurance_pct} />
       <CurrencyField label="Building Limit" field={data.limits.building_limit} />
       <CurrencyField label="Business Personal Property" field={data.limits.business_personal_property_limit} />
       <CurrencyField label="Business Income" field={data.limits.business_income_limit} />
