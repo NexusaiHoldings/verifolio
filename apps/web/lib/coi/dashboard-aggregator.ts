@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
 
 export type ComplianceStatus = 'compliant' | 'expiring_soon' | 'non_compliant' | 'missing';
 export type GapSeverity = 'critical' | 'high' | 'medium' | 'low' | 'none';
@@ -44,7 +44,14 @@ function getPool(): Pool {
   if (!globalThis._coiDashPool) {
     const connectionString = process.env.DATABASE_URL;
     if (!connectionString) throw new Error('[coi] DATABASE_URL environment variable is not set');
-    globalThis._coiDashPool = new Pool({ connectionString, max: 10, idleTimeoutMillis: 30000 });
+    // Runtime require (NOT a static `import { Pool } from 'pg'`) so Next's file
+    // tracer includes pg in the serverless bundle — matches the proven
+    // substrate db.ts / coi/vendors.ts pattern. The static import resolved at
+    // build but threw "Cannot find module 'pg'" at runtime → server-component
+    // render error → /dashboard 500 (post-deploy audit 2026-06-09).
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { Pool: PgPool } = require('pg') as { Pool: new (cfg: Record<string, unknown>) => Pool };
+    globalThis._coiDashPool = new PgPool({ connectionString, max: 10, idleTimeoutMillis: 30000 });
   }
   return globalThis._coiDashPool;
 }

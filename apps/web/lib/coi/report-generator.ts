@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
 import { getDashboardData } from './dashboard-aggregator';
 import type { VendorComplianceRecord, ComplianceSummary } from './dashboard-aggregator';
 
@@ -31,7 +31,12 @@ function getPool(): Pool {
   if (!globalThis._coiReportPool) {
     const connectionString = process.env.DATABASE_URL;
     if (!connectionString) throw new Error('[coi] DATABASE_URL environment variable is not set');
-    globalThis._coiReportPool = new Pool({ connectionString, max: 5, idleTimeoutMillis: 30000 });
+    // Runtime require (not static import) so pg is traced into the bundle — see
+    // dashboard-aggregator.ts. Static `import { Pool } from 'pg'` → runtime
+    // "Cannot find module 'pg'" → 500.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { Pool: PgPool } = require('pg') as { Pool: new (cfg: Record<string, unknown>) => Pool };
+    globalThis._coiReportPool = new PgPool({ connectionString, max: 5, idleTimeoutMillis: 30000 });
   }
   return globalThis._coiReportPool;
 }

@@ -93,6 +93,61 @@ CREATE TABLE IF NOT EXISTS coi_vendor_properties (
   UNIQUE (vendor_id, property_id)
 );
 
+-- post-deploy-fix 2026-06-09: the dashboard/scoring queries reference these
+-- two tables + deleted_at columns that the original DDL never defined
+-- (schema-divergence across features). Added so the company DB is coherent.
+ALTER TABLE coi_vendors    ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+ALTER TABLE coi_properties ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+CREATE TABLE IF NOT EXISTS coi_compliance_templates (
+  id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id                   UUID,
+  property_id              UUID REFERENCES coi_properties(id) ON DELETE CASCADE,
+  name                     TEXT,
+  certificate_type         TEXT NOT NULL,
+  required_coverage_amount NUMERIC,
+  coverage_lines           JSONB NOT NULL DEFAULT '[]'::jsonb,
+  entries                  JSONB NOT NULL DEFAULT '[]'::jsonb,
+  created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at               TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS coi_certificates (
+  id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id                  UUID,
+  extraction_id           UUID,
+  vendor_id               UUID REFERENCES coi_vendors(id) ON DELETE CASCADE,
+  vendor_name             TEXT,
+  property_id             UUID REFERENCES coi_properties(id) ON DELETE SET NULL,
+  certificate_type        TEXT,
+  policy_type             TEXT,
+  form_type               TEXT,
+  file_url                TEXT,
+  document_url            TEXT,
+  status                  TEXT NOT NULL DEFAULT 'active',
+  is_active               BOOLEAN NOT NULL DEFAULT true,
+  insured_name            TEXT,
+  insurer                 TEXT,
+  policy_number           TEXT,
+  effective_date          DATE,
+  expiration_date         DATE,
+  coverage_amount         NUMERIC,
+  general_liability_limit NUMERIC,
+  auto_liability_limit    NUMERIC,
+  workers_comp_limit      NUMERIC,
+  umbrella_limit          NUMERIC,
+  additional_insured      TEXT,
+  certificate_holder      TEXT,
+  promoted_at             TIMESTAMPTZ,
+  promoted_by             UUID,
+  created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at              TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_coi_compliance_templates_property ON coi_compliance_templates(property_id);
+CREATE INDEX IF NOT EXISTS idx_coi_certificates_vendor   ON coi_certificates(vendor_id);
+CREATE INDEX IF NOT EXISTS idx_coi_certificates_property ON coi_certificates(property_id);
+
 CREATE INDEX IF NOT EXISTS idx_coi_vendors_org_id ON coi_vendors(org_id);
 CREATE INDEX IF NOT EXISTS idx_coi_properties_org_id ON coi_properties(org_id);
 CREATE INDEX IF NOT EXISTS idx_coi_vendor_properties_vendor ON coi_vendor_properties(vendor_id);
