@@ -43,7 +43,9 @@ interface ExtractionResult {
   extracted_fields: Record<string, string | number | null>;
 }
 
-function evaluateCoverageField(field: CoverageField): { passed: boolean; severity: "critical" | "major" | "minor"; remediation: string } {
+function evaluateCoverageField(
+  field: CoverageField,
+): { passed: boolean; severity: "critical" | "major" | "minor"; remediation: string } {
   const { field_name, required_value, operator, actual_value } = field;
 
   if (required_value === null) {
@@ -65,7 +67,6 @@ function evaluateCoverageField(field: CoverageField): { passed: boolean; severit
   } else if (operator === "eq") {
     passed = String(actual_value).toLowerCase() === String(required_value).toLowerCase();
   } else {
-    // Default: treat as presence check
     passed = actual_value !== null && actual_value !== undefined && actual_value !== "";
   }
 
@@ -73,7 +74,6 @@ function evaluateCoverageField(field: CoverageField): { passed: boolean; severit
     return { passed: true, severity: "minor", remediation: "" };
   }
 
-  // Determine severity based on field category
   const criticalFields = [
     "general_liability_each_occurrence",
     "general_liability_aggregate",
@@ -110,6 +110,13 @@ function evaluateCoverageField(field: CoverageField): { passed: boolean; severit
   return { passed, severity, remediation };
 }
 
+function parseJsonField<T>(value: unknown): T {
+  if (typeof value === "string") {
+    return JSON.parse(value) as T;
+  }
+  return value as T;
+}
+
 export async function handleScoreCoiComplianceGap(
   ctx: HandlerContext,
   args: Args,
@@ -130,51 +137,51 @@ export async function handleScoreCoiComplianceGap(
     let extraction: ExtractionResult | null = null;
 
     if (extraction_id) {
-      const row = await ctx.db.queryRow<{
+      const rows = await ctx.db.query<{
         id: string;
         certificate_id: string;
         vendor_id: string;
-        extracted_fields: string;
+        extracted_fields: unknown;
       }>(
         `SELECT id, certificate_id, vendor_id, extracted_fields
          FROM coi_extraction_results
          WHERE id = $1`,
-        [extraction_id],
+        extraction_id,
       );
+      const row = rows[0] ?? null;
       if (row) {
         extraction = {
           id: row.id,
           certificate_id: row.certificate_id,
           vendor_id: row.vendor_id,
-          extracted_fields:
-            typeof row.extracted_fields === "string"
-              ? JSON.parse(row.extracted_fields)
-              : (row.extracted_fields as Record<string, string | number | null>),
+          extracted_fields: parseJsonField<Record<string, string | number | null>>(
+            row.extracted_fields,
+          ),
         };
       }
     } else if (certificate_id) {
-      const row = await ctx.db.queryRow<{
+      const rows = await ctx.db.query<{
         id: string;
         certificate_id: string;
         vendor_id: string;
-        extracted_fields: string;
+        extracted_fields: unknown;
       }>(
         `SELECT id, certificate_id, vendor_id, extracted_fields
          FROM coi_extraction_results
          WHERE certificate_id = $1
          ORDER BY created_at DESC
          LIMIT 1`,
-        [certificate_id],
+        certificate_id,
       );
+      const row = rows[0] ?? null;
       if (row) {
         extraction = {
           id: row.id,
           certificate_id: row.certificate_id,
           vendor_id: row.vendor_id,
-          extracted_fields:
-            typeof row.extracted_fields === "string"
-              ? JSON.parse(row.extracted_fields)
-              : (row.extracted_fields as Record<string, string | number | null>),
+          extracted_fields: parseJsonField<Record<string, string | number | null>>(
+            row.extracted_fields,
+          ),
         };
       }
     }
@@ -187,32 +194,30 @@ export async function handleScoreCoiComplianceGap(
     let template: ComplianceTemplate | null = null;
 
     if (template_id) {
-      const row = await ctx.db.queryRow<{
+      const rows = await ctx.db.query<{
         id: string;
         name: string;
-        coverage_lines: string;
+        coverage_lines: unknown;
       }>(
         `SELECT id, name, coverage_lines
          FROM coi_compliance_templates
          WHERE id = $1`,
-        [template_id],
+        template_id,
       );
+      const row = rows[0] ?? null;
       if (row) {
         template = {
           id: row.id,
           name: row.name,
-          coverage_lines:
-            typeof row.coverage_lines === "string"
-              ? JSON.parse(row.coverage_lines)
-              : (row.coverage_lines as CoverageField[]),
+          coverage_lines: parseJsonField<CoverageField[]>(row.coverage_lines),
         };
       }
     } else {
       // Auto-resolve: find the template bound to the property/vendor
-      const row = await ctx.db.queryRow<{
+      const rows = await ctx.db.query<{
         id: string;
         name: string;
-        coverage_lines: string;
+        coverage_lines: unknown;
       }>(
         `SELECT ct.id, ct.name, ct.coverage_lines
          FROM coi_compliance_templates ct
@@ -222,42 +227,38 @@ export async function handleScoreCoiComplianceGap(
          WHERE cc.id = $2
          ORDER BY ct.created_at DESC
          LIMIT 1`,
-        [extraction.vendor_id, extraction.certificate_id],
+        extraction.vendor_id,
+        extraction.certificate_id,
       );
+      const row = rows[0] ?? null;
       if (row) {
         template = {
           id: row.id,
           name: row.name,
-          coverage_lines:
-            typeof row.coverage_lines === "string"
-              ? JSON.parse(row.coverage_lines)
-              : (row.coverage_lines as CoverageField[]),
+          coverage_lines: parseJsonField<CoverageField[]>(row.coverage_lines),
         };
       }
     }
 
     if (!template) {
       // Fall back to the default template if no binding found
-      const row = await ctx.db.queryRow<{
+      const rows = await ctx.db.query<{
         id: string;
         name: string;
-        coverage_lines: string;
+        coverage_lines: unknown;
       }>(
         `SELECT id, name, coverage_lines
          FROM coi_compliance_templates
          WHERE is_default = true
          ORDER BY created_at DESC
          LIMIT 1`,
-        [],
       );
+      const row = rows[0] ?? null;
       if (row) {
         template = {
           id: row.id,
           name: row.name,
-          coverage_lines:
-            typeof row.coverage_lines === "string"
-              ? JSON.parse(row.coverage_lines)
-              : (row.coverage_lines as CoverageField[]),
+          coverage_lines: parseJsonField<CoverageField[]>(row.coverage_lines),
         };
       }
     }
@@ -335,25 +336,23 @@ export async function handleScoreCoiComplianceGap(
          gap_lines      = EXCLUDED.gap_lines,
          scored_at      = EXCLUDED.scored_at,
          updated_at     = now()`,
-      [
-        extraction.id,
-        extraction.certificate_id,
-        extraction.vendor_id,
-        template.id,
-        template.name,
-        overallStatus,
-        totalLines,
-        passedLines,
-        criticalGaps,
-        majorGaps,
-        minorGaps,
-        JSON.stringify(gapLines),
-        scoredAt,
-      ],
+      extraction.id,
+      extraction.certificate_id,
+      extraction.vendor_id,
+      template.id,
+      template.name,
+      overallStatus,
+      totalLines,
+      passedLines,
+      criticalGaps,
+      majorGaps,
+      minorGaps,
+      JSON.stringify(gapLines),
+      scoredAt,
     );
 
     // 5. Emit compliance-scored event
-    await ctx.events.emit("coi.compliance_scored", {
+    await ctx.events.publish("coi.compliance_scored", {
       extraction_id: extraction.id,
       certificate_id: extraction.certificate_id,
       vendor_id: extraction.vendor_id,
