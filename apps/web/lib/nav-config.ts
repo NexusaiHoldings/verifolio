@@ -1,55 +1,61 @@
-export const NAV_CONFIG = {
+export type NavLink = { href: string; label: string; description?: string };
+export type NavGroup = { label: string; links: NavLink[] };
+
+export const NAV_CONFIG: {
+  primary: NavLink[];
+  groups: NavGroup[];
+} = {
   primary: [
-    { title: "Home", href: "/" },
-    { title: "Dashboard", href: "/dashboard" },
-    { title: "Vendors", href: "/vendors" },
-    { title: "Properties", href: "/properties" },
-    { title: "Certificates", href: "/certificates" },
-    { title: "Compliance Templates", href: "/compliance/templates" },
-    { title: "Reports", href: "/reports" },
-    { title: "Review Queue", href: "/review-queue" },
+    { label: "Home", href: "/" },
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Vendors", href: "/vendors" },
+    { label: "Properties", href: "/properties" },
+    { label: "Certificates", href: "/certificates" },
+    { label: "Compliance Templates", href: "/compliance/templates" },
+    { label: "Reports", href: "/reports" },
+    { label: "Review Queue", href: "/review-queue" },
   ],
   groups: [
     {
-      title: "Operations",
-      items: [
+      label: "Operations",
+      links: [
         {
-          title: "Dashboard",
+          label: "Dashboard",
           href: "/dashboard",
           description: "Monitor compliance status and key insurance metrics at a glance.",
         },
         {
-          title: "Vendors",
+          label: "Vendors",
           href: "/vendors",
           description: "Manage vendor rosters and track certificate of insurance compliance.",
         },
         {
-          title: "Properties",
+          label: "Properties",
           href: "/properties",
           description: "Organize properties and view associated vendor coverage.",
         },
         {
-          title: "Certificates",
+          label: "Certificates",
           href: "/certificates",
           description: "Search and review uploaded certificates for coverage gaps or expirations.",
         },
         {
-          title: "Review Queue",
+          label: "Review Queue",
           href: "/review-queue",
           description: "Triage newly ingested documents that require verification or follow-up.",
         },
       ],
     },
     {
-      title: "Compliance",
-      items: [
+      label: "Compliance",
+      links: [
         {
-          title: "Compliance Templates",
+          label: "Compliance Templates",
           href: "/compliance/templates",
           description: "Define insurance requirements and map coverage rules across portfolios.",
         },
         {
-          title: "Reports",
+          label: "Reports",
           href: "/reports",
           description: "Run portfolio-wide compliance analytics and export audit-ready reports.",
         },
