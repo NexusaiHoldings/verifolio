@@ -5,7 +5,7 @@
  */
 
 import { notFound } from "next/navigation";
-import type { JSX } from "react";
+import type { JSX, ReactNode } from "react";
 import {
   getCertificate,
   getLatestExtraction,
@@ -14,7 +14,7 @@ import {
 } from "@/lib/coi/extract";
 import { acordFormLabel, CONFIDENCE_THRESHOLD } from "@/lib/coi/acord-schema";
 import type { AcordExtractionResult, ConfidenceField } from "@/lib/coi/acord-schema";
-import { getServerSession } from "@nexus/identity-and-access";
+import { getSessionUser } from "@/lib/admin-auth";
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -75,7 +75,7 @@ function Section({
   children,
 }: {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }): JSX.Element {
   return (
     <section
@@ -256,12 +256,12 @@ interface PageProps {
 }
 
 export default async function CertificatePage({ params }: PageProps): Promise<JSX.Element> {
-  const session = await getServerSession();
-  if (!session?.user?.orgId) {
-    notFound();
-  }
+  const user = await getSessionUser();
+  if (!user) notFound();
 
-  const orgId = session.user.orgId as string;
+  const orgId = process.env.DEFAULT_ORG_ID ?? "";
+  if (!orgId) notFound();
+
   const cert: CertificateRow | null = await getCertificate(params.id, orgId);
 
   if (!cert) {

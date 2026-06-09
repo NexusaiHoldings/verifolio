@@ -15,7 +15,7 @@ import {
 } from "@/lib/coi/extract";
 import { CONFIDENCE_THRESHOLD, acordFormLabel } from "@/lib/coi/acord-schema";
 import type { AcordExtractionResult } from "@/lib/coi/acord-schema";
-import { getServerSession } from "@nexus/identity-and-access";
+import { getSessionUser } from "@/lib/admin-auth";
 
 // ── Server action ──────────────────────────────────────────────────────────────
 
@@ -23,9 +23,9 @@ async function submitReview(formData: FormData): Promise<void> {
   "use server";
 
   const { markExtractionReviewed } = await import("@/lib/coi/extract");
-  const session = await getServerSession();
+  const user = await getSessionUser();
 
-  if (!session?.user?.id) return;
+  if (!user?.id) return;
 
   const extractionId = formData.get("extractionId") as string;
   if (!extractionId) return;
@@ -33,13 +33,12 @@ async function submitReview(formData: FormData): Promise<void> {
   const corrections: Record<string, unknown> = {};
   for (const [key, value] of formData.entries()) {
     if (key === "extractionId" || typeof value !== "string") continue;
-    // Each field stores as a ConfidenceField with reviewer confidence = 1.0
     corrections[key] = { value, confidence: 1.0 };
   }
 
   await markExtractionReviewed(
     extractionId,
-    session.user.id as string,
+    user.id,
     corrections as Partial<AcordExtractionResult>,
   );
 
@@ -278,12 +277,12 @@ interface PageProps {
 }
 
 export default async function ReviewPage({ params }: PageProps): Promise<JSX.Element> {
-  const session = await getServerSession();
-  if (!session?.user?.orgId) {
-    notFound();
-  }
+  const user = await getSessionUser();
+  if (!user) notFound();
 
-  const orgId = session.user.orgId as string;
+  const orgId = process.env.DEFAULT_ORG_ID ?? "";
+  if (!orgId) notFound();
+
   const cert = await getCertificate(params.id, orgId);
 
   if (!cert) {
