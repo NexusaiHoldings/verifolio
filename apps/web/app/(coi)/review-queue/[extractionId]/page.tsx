@@ -107,6 +107,8 @@ export default async function ExtractionDetailPage({
   async function handleReviewAction(formData: FormData): Promise<void> {
     "use server";
 
+    if (!user) redirect("/login");
+
     const decision = formData.get("decision");
     if (decision !== "approved" && decision !== "rejected") {
       redirect(
