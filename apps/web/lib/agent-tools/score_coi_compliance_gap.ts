@@ -10,7 +10,6 @@
  */
 
 import type { HandlerContext, HandlerResult } from "@nexus/identity-and-access";
-import { err, ok } from "@nexus/identity-and-access";
 
 export type Args = Record<string, unknown>;
 
@@ -97,10 +96,10 @@ export async function handleScoreCoiComplianceGap(
   const propertyId = args["property_id"];
 
   if (typeof certificateId !== "string" || !certificateId.trim()) {
-    return err(400, "certificate_id is required");
+    return { status: 400, body: "certificate_id is required" };
   }
   if (typeof propertyId !== "string" || !propertyId.trim()) {
-    return err(400, "property_id is required");
+    return { status: 400, body: "property_id is required" };
   }
 
   // Load the COI extraction record
@@ -115,11 +114,11 @@ export async function handleScoreCoiComplianceGap(
       certificateId.trim(),
     );
   } catch {
-    return err(500, "failed to load COI extraction record");
+    return { status: 500, body: "failed to load COI extraction record" };
   }
 
   if (extractions.length === 0) {
-    return err(404, "certificate not found");
+    return { status: 404, body: "certificate not found" };
   }
   const extraction = extractions[0];
 
@@ -135,11 +134,11 @@ export async function handleScoreCoiComplianceGap(
       propertyId.trim(),
     );
   } catch {
-    return err(500, "failed to load compliance template");
+    return { status: 500, body: "failed to load compliance template" };
   }
 
   if (templateRows.length === 0) {
-    return err(404, "no active compliance template found for property");
+    return { status: 404, body: "no active compliance template found for property" };
   }
   const templateId = templateRows[0].template_id;
 
@@ -154,7 +153,7 @@ export async function handleScoreCoiComplianceGap(
       templateId,
     );
   } catch {
-    return err(500, "failed to load compliance template rules");
+    return { status: 500, body: "failed to load compliance template rules" };
   }
 
   // Parse extracted coverage fields
@@ -243,7 +242,7 @@ export async function handleScoreCoiComplianceGap(
       createdAt,
     );
   } catch {
-    return err(500, "failed to persist compliance result");
+    return { status: 500, body: "failed to persist compliance result" };
   }
 
   await ctx.events.publish("coi.compliance_scored", {
@@ -263,5 +262,5 @@ export async function handleScoreCoiComplianceGap(
     created_at: createdAt,
   };
 
-  return ok({ result: report });
+  return { status: 200, body: { result: report } };
 }
