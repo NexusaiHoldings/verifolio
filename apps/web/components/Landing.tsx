@@ -10,9 +10,11 @@ import Link from "next/link";
 import type { JSX } from "react";
 import { homeConfig } from "@/lib/home/home-config";
 import { NAV_CONFIG } from "@/lib/nav-config";
+import { getSiteMedia } from "@/lib/site-media";
 
-export function Landing(): JSX.Element {
+export async function Landing(): Promise<JSX.Element> {
   const name = process.env.COMPANY_NAME || "Portfolio Company";
+  const launchVideo = await getSiteMedia("launch_video");
   const headline = homeConfig.headline || name;
   const subhead =
     homeConfig.subhead ||
@@ -51,6 +53,24 @@ export function Landing(): JSX.Element {
           </Link>
         ) : null}
       </div>
+      {launchVideo ? (
+        <video
+          controls
+          playsInline
+          preload="metadata"
+          style={{
+            width: "100%",
+            marginTop: "2rem",
+            borderRadius: 12,
+            border: "1px solid var(--substrate-border)",
+            aspectRatio: "16 / 9",
+            objectFit: "cover",
+          }}
+          src={launchVideo}
+        >
+          Your browser does not support the video element.
+        </video>
+      ) : null}
     </section>
   );
 }

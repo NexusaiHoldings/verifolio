@@ -1,28 +1,28 @@
 /**
  * active-theme — the resolved ThemeContract this company wears.
- * Backported by substrate-ui-baseline / company-theme-authoring-001. Do NOT hand-edit.
+ * Written from the approved brand mood board (visual phase 3b). Do NOT hand-edit.
  */
 import type { ThemeContract } from "./contract";
 
 export const activeTheme: ThemeContract = {
-  "color": {
-    "bg": "#ffffff",
-    "surface": "#f6f7f9",
-    "surfaceAlt": "#eef1f5",
-    "text": "#1a2332",
-    "textMuted": "#566074",
-    "border": "#dde2ea",
-    "borderStrong": "#c2cad6",
-    "accent": "#1e3a5f",
-    "accentText": "#ffffff",
-    "danger": "#a32d2d",
-    "success": "#1f6b45"
-  },
   "type": {
-    "fontHeading": "source-serif",
-    "fontBody": "system-sans"
+    "fontBody": "inter",
+    "fontHeading": "space-grotesk"
+  },
+  "color": {
+    "bg": "#FFFFFF",
+    "text": "#2E3A45",
+    "accent": "#9A6308",
+    "border": "#C3D2E0",
+    "danger": "#C0392B",
+    "success": "#1E7A4D",
+    "surface": "#F4F8FB",
+    "textMuted": "#5A6B78",
+    "accentText": "#FFFFFF",
+    "surfaceAlt": "#D8E3EE",
+    "borderStrong": "#1B3A57"
   },
   "shape": {
-    "radius": 4
+    "radius": 6
   }
 };

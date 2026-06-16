@@ -8,6 +8,7 @@
 import type { JSX } from "react";
 import Link from "next/link";
 import { listPublishedPosts } from "@/lib/blog";
+import { getSiteMedia } from "@/lib/site-media";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -27,9 +28,28 @@ function formatDate(iso: string): string {
 export default async function BlogIndexPage(): Promise<JSX.Element> {
   const company = process.env.COMPANY_NAME || "our";
   const posts = await listPublishedPosts();
+  const launchVideo = await getSiteMedia("launch_video");
   return (
     <main>
       <h1>Blog</h1>
+      {launchVideo ? (
+        <video
+          controls
+          playsInline
+          preload="metadata"
+          style={{
+            width: "100%",
+            borderRadius: 10,
+            marginBottom: 24,
+            aspectRatio: "16 / 9",
+            objectFit: "cover",
+            border: "1px solid var(--substrate-border)",
+          }}
+          src={launchVideo}
+        >
+          Your browser does not support the video element.
+        </video>
+      ) : null}
       {posts.length === 0 ? (
         <p className="empty">
           No posts yet — the {company} blog is just getting started.

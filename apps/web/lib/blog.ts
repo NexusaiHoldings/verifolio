@@ -14,10 +14,12 @@ export interface BlogPostSummary {
   published_at: string;
   tags: string[];
   hero_image_url: string | null;
+  og_image_url: string | null;
 }
 
 export interface BlogPost extends BlogPostSummary {
   content_html: string;
+  audio_url: string | null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,7 +59,7 @@ function normalizeTags(raw: unknown): string[] {
 export async function listPublishedPosts(limit = 50): Promise<BlogPostSummary[]> {
   try {
     const { rows } = await getPool().query(
-      `SELECT slug, title, description, author, published_at, tags, hero_image_url
+      `SELECT slug, title, description, author, published_at, tags, hero_image_url, og_image_url
          FROM blog_posts
         WHERE status = 'published'
         ORDER BY published_at DESC
@@ -72,6 +74,7 @@ export async function listPublishedPosts(limit = 50): Promise<BlogPostSummary[]>
       published_at: String(r.published_at),
       tags: normalizeTags(r.tags),
       hero_image_url: r.hero_image_url ? String(r.hero_image_url) : null,
+      og_image_url: r.og_image_url ? String(r.og_image_url) : null,
     }));
   } catch {
     // Table may not exist yet on a fresh deploy — render an empty index
@@ -83,7 +86,7 @@ export async function listPublishedPosts(limit = 50): Promise<BlogPostSummary[]>
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
     const { rows } = await getPool().query(
-      `SELECT slug, title, description, author, published_at, tags, hero_image_url, content_html
+      `SELECT slug, title, description, author, published_at, tags, hero_image_url, og_image_url, audio_url, content_html
          FROM blog_posts
         WHERE slug = $1 AND status = 'published'
         LIMIT 1`,
@@ -99,6 +102,8 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       published_at: String(r.published_at),
       tags: normalizeTags(r.tags),
       hero_image_url: r.hero_image_url ? String(r.hero_image_url) : null,
+      og_image_url: r.og_image_url ? String(r.og_image_url) : null,
+      audio_url: r.audio_url ? String(r.audio_url) : null,
       content_html: String(r.content_html),
     };
   } catch {

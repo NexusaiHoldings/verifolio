@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS blog_posts (
   content_html text NOT NULL,
   content_md text,
   hero_image_url text,
+  og_image_url text,
+  audio_url text,
   tags jsonb NOT NULL DEFAULT '[]'::jsonb,
   author text NOT NULL DEFAULT 'Team',
   status text NOT NULL DEFAULT 'published',
@@ -22,4 +24,8 @@ CREATE TABLE IF NOT EXISTS blog_posts (
 );
 CREATE INDEX IF NOT EXISTS idx_blog_posts_published
   ON blog_posts (published_at DESC) WHERE status = 'published';
+-- Backfill columns for companies whose blog_posts predates them
+-- (CREATE TABLE IF NOT EXISTS won't add them to an existing table).
+ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS og_image_url text;
+ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS audio_url text;
 `;
