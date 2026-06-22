@@ -16,6 +16,7 @@ import { getSiteMedia } from "@/lib/site-media";
 export async function Landing(): Promise<JSX.Element> {
   const name = process.env.COMPANY_NAME || "Portfolio Company";
   const launchVideo = await getSiteMedia("launch_video");
+  const heroImage = await getSiteMedia("hero_image");
   const headline = homeConfig.headline || name;
   const subhead =
     homeConfig.subhead ||
@@ -31,29 +32,63 @@ export async function Landing(): Promise<JSX.Element> {
   const secondary = homeConfig.secondaryCta;
   const features = homeConfig.features || [];
 
+  const heroCopy = (
+    <div style={{ flex: "1 1 360px", minWidth: 0 }}>
+      <h1 style={{ fontSize: "2.4rem", lineHeight: 1.12, marginBottom: "0.75rem" }}>
+        {headline}
+      </h1>
+      <p
+        style={{
+          fontSize: "1.15rem",
+          color: "var(--substrate-muted)",
+          marginBottom: "1.75rem",
+        }}
+      >
+        {subhead}
+      </p>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <Link href={primary.href} className="btn">
+          {primary.label}
+        </Link>
+        {secondary ? (
+          <Link href={secondary.href} className="btn secondary">
+            {secondary.label}
+          </Link>
+        ) : null}
+      </div>
+    </div>
+  );
+
   return (
     <>
-      <section style={{ maxWidth: 760, padding: "32px 0 8px" }}>
-        <h1 style={{ fontSize: "2.4rem", lineHeight: 1.12, marginBottom: "0.75rem" }}>
-          {headline}
-        </h1>
-        <p
+      {/* Image-forward hero: brand-grounded hero image (mood-board-generated) beside
+          the copy on wide screens, stacked on narrow. Falls back to copy-only. */}
+      <section style={{ padding: "32px 0 8px" }}>
+        <div
           style={{
-            fontSize: "1.15rem",
-            color: "var(--substrate-muted)",
-            marginBottom: "1.75rem",
+            display: "flex",
+            gap: 32,
+            alignItems: "center",
+            flexWrap: "wrap",
           }}
         >
-          {subhead}
-        </p>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <Link href={primary.href} className="btn">
-            {primary.label}
-          </Link>
-          {secondary ? (
-            <Link href={secondary.href} className="btn secondary">
-              {secondary.label}
-            </Link>
+          {heroCopy}
+          {heroImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={heroImage}
+              alt={`${name} — brand hero`}
+              style={{
+                flex: "1 1 380px",
+                minWidth: 0,
+                width: "100%",
+                maxWidth: 560,
+                borderRadius: 14,
+                border: "1px solid var(--substrate-border)",
+                aspectRatio: "3 / 2",
+                objectFit: "cover",
+              }}
+            />
           ) : null}
         </div>
         {launchVideo ? (

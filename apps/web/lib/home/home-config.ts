@@ -13,27 +13,27 @@ export interface HomeConfig {
 }
 
 export const homeConfig: HomeConfig = {
-  "headline": "Stop Missing Vendor COIs Before They Become Liability",
-  "subhead": "Verifolio is AI-powered COI compliance software built for property management companies. Operations teams managing 30 to 200+ vendors finally ditch the spreadsheet and get instant coverage gap alerts.",
-  "featuresTitle": "Everything your operations team needs to stay covered",
+  "headline": "Your vendor insurance compliance, handled automatically",
+  "subhead": "Verifolio is AI-powered COI tracking built for property management companies. Stop chasing spreadsheets and start knowing \u2014 instantly \u2014 which vendors are covered, which aren't, and what's at risk.",
+  "featuresTitle": "Everything your operations team actually needs",
   "features": [
     {
-      "title": "AI-Powered COI Data Extraction",
-      "body": "Upload any certificate of insurance and Verifolio's AI instantly reads and extracts policy limits, expiration dates, and named insureds\u2014no manual data entry required."
+      "title": "AI-powered COI extraction",
+      "body": "Upload any certificate of insurance and Verifolio reads it automatically \u2014 pulling coverage types, limits, dates, and named insureds in seconds so your team never manually enters a policy detail again."
     },
     {
-      "title": "Automated Compliance Scoring",
-      "body": "Every vendor receives a real-time compliance score based on your required coverage thresholds, so you always know which vendors are compliant and which are putting you at risk."
+      "title": "Real-time compliance scoring",
+      "body": "Every vendor receives a live compliance score against your required coverage standards, so you can see at a glance who is fully covered, who has gaps, and where your liability exposure sits right now."
     },
     {
-      "title": "Coverage Gap Alerts",
-      "body": "Verifolio flags missing, expired, or insufficient coverage before it becomes a liability event, sending proactive alerts so your team can chase vendors down before deadlines pass."
+      "title": "Expiration alerts that follow up for you",
+      "body": "Verifolio automatically flags expiring certificates and notifies vendors before coverage lapses, replacing the calendar reminders and follow-up emails your team sends manually today."
     },
     {
-      "title": "Centralized Vendor COI Dashboard",
-      "body": "Replace scattered spreadsheets with a single dashboard showing compliance status across all 30 to 200+ vendors, giving operations managers an instant portfolio-wide view at any time."
+      "title": "One dashboard for 30 to 200 vendors",
+      "body": "Replace the spreadsheet with a clean, centralized compliance dashboard that gives operations managers a single source of truth across every vendor, property, and coverage requirement in your portfolio."
     }
   ],
-  "closingHeadline": "Your next missed COI is the last one you can afford\u2014get covered today",
+  "closingHeadline": "Your next COI audit starts with zero spreadsheets",
   "mode": "landing"
 };
