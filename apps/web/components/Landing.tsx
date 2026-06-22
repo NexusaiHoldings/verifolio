@@ -1,10 +1,11 @@
 /**
- * Landing — themed hero for landing-mode companies (company-root-landing-001).
+ * Landing — themed marketing page for landing-mode companies (company-root-landing-001).
  *
  * Server component, rendered inside <main> so it inherits the substrate theme +
- * element styling. Resolves missing config from COMPANY_NAME/COMPANY_DESCRIPTION
- * and falls back the primary CTA to the first non-Home nav entry, then to the
- * conversation surface at /assistant.
+ * element styling. Renders a hero (headline / subhead / CTAs / optional launch
+ * video) + a feature-section grid + a closing CTA band, all from homeConfig
+ * (provisioning-owned, generated from the plan). Falls back gracefully when a
+ * field is missing so an undecided company still gets a real front door.
  */
 import Link from "next/link";
 import type { JSX } from "react";
@@ -28,49 +29,113 @@ export async function Landing(): Promise<JSX.Element> {
       ? { label: firstNav.label, href: firstNav.href }
       : { label: "Get started", href: "/assistant" });
   const secondary = homeConfig.secondaryCta;
+  const features = homeConfig.features || [];
 
   return (
-    <section style={{ maxWidth: 720, padding: "32px 0 24px" }}>
-      <h1 style={{ fontSize: "2.4rem", lineHeight: 1.12, marginBottom: "0.75rem" }}>
-        {headline}
-      </h1>
-      <p
-        style={{
-          fontSize: "1.15rem",
-          color: "var(--substrate-muted)",
-          marginBottom: "1.75rem",
-        }}
-      >
-        {subhead}
-      </p>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <Link href={primary.href} className="btn">
-          {primary.label}
-        </Link>
-        {secondary ? (
-          <Link href={secondary.href} className="btn secondary">
-            {secondary.label}
-          </Link>
-        ) : null}
-      </div>
-      {launchVideo ? (
-        <video
-          controls
-          playsInline
-          preload="metadata"
+    <>
+      <section style={{ maxWidth: 760, padding: "32px 0 8px" }}>
+        <h1 style={{ fontSize: "2.4rem", lineHeight: 1.12, marginBottom: "0.75rem" }}>
+          {headline}
+        </h1>
+        <p
           style={{
-            width: "100%",
-            marginTop: "2rem",
-            borderRadius: 12,
-            border: "1px solid var(--substrate-border)",
-            aspectRatio: "16 / 9",
-            objectFit: "cover",
+            fontSize: "1.15rem",
+            color: "var(--substrate-muted)",
+            marginBottom: "1.75rem",
           }}
-          src={launchVideo}
         >
-          Your browser does not support the video element.
-        </video>
+          {subhead}
+        </p>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <Link href={primary.href} className="btn">
+            {primary.label}
+          </Link>
+          {secondary ? (
+            <Link href={secondary.href} className="btn secondary">
+              {secondary.label}
+            </Link>
+          ) : null}
+        </div>
+        {launchVideo ? (
+          <video
+            controls
+            playsInline
+            preload="metadata"
+            style={{
+              width: "100%",
+              marginTop: "2rem",
+              borderRadius: 12,
+              border: "1px solid var(--substrate-border)",
+              aspectRatio: "16 / 9",
+              objectFit: "cover",
+            }}
+            src={launchVideo}
+          >
+            Your browser does not support the video element.
+          </video>
+        ) : null}
+      </section>
+
+      {features.length > 0 ? (
+        <section style={{ padding: "40px 0 8px" }}>
+          {homeConfig.featuresTitle ? (
+            <h2
+              style={{
+                fontSize: "1.6rem",
+                marginBottom: "1.5rem",
+                lineHeight: 1.2,
+              }}
+            >
+              {homeConfig.featuresTitle}
+            </h2>
+          ) : null}
+          <div
+            style={{
+              display: "grid",
+              gap: 20,
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            }}
+          >
+            {features.map((f, i) => (
+              <div
+                key={i}
+                style={{
+                  border: "1px solid var(--substrate-border)",
+                  borderRadius: 12,
+                  padding: "20px 22px",
+                  background: "var(--substrate-surface, transparent)",
+                }}
+              >
+                <h3 style={{ fontSize: "1.1rem", marginBottom: "0.5rem", lineHeight: 1.25 }}>
+                  {f.title}
+                </h3>
+                <p style={{ color: "var(--substrate-muted)", fontSize: "0.98rem", lineHeight: 1.5 }}>
+                  {f.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
       ) : null}
-    </section>
+
+      {homeConfig.closingHeadline ? (
+        <section
+          style={{
+            margin: "48px 0 24px",
+            padding: "36px 28px",
+            borderRadius: 14,
+            border: "1px solid var(--substrate-border)",
+            textAlign: "center",
+          }}
+        >
+          <h2 style={{ fontSize: "1.5rem", marginBottom: "1.25rem", lineHeight: 1.25 }}>
+            {homeConfig.closingHeadline}
+          </h2>
+          <Link href={primary.href} className="btn">
+            {primary.label}
+          </Link>
+        </section>
+      ) : null}
+    </>
   );
 }
