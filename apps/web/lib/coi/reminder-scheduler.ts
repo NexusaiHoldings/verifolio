@@ -166,19 +166,20 @@ export async function runExpirationSweep(db: Db, events: EventBus): Promise<Swee
          p.id                                                   AS property_id,
          p.name                                                 AS property_name,
          c.certificate_type,
-         TO_CHAR(c.expiry_date, 'YYYY-MM-DD')                  AS expiry_date,
-         (c.expiry_date::date - CURRENT_DATE)::int              AS days_until_expiry,
+         TO_CHAR(c.expiration_date, 'YYYY-MM-DD')                  AS expiry_date,
+         (c.expiration_date::date - CURRENT_DATE)::int              AS days_until_expiry,
          p.escalation_email,
          COALESCE(p.escalation_threshold_days, 7)::int         AS escalation_threshold_days,
          COALESCE(p.reminders_enabled, true)                   AS reminder_enabled
        FROM coi_certificates c
        JOIN coi_vendors v ON v.id = c.vendor_id
-       JOIN coi_properties p ON p.id = v.property_id
-       WHERE c.expiry_date::date <= CURRENT_DATE + INTERVAL '30 days'
+       JOIN coi_vendor_properties vp ON vp.vendor_id = v.id
+       JOIN coi_properties p ON p.id = vp.property_id
+       WHERE c.expiration_date::date <= CURRENT_DATE + INTERVAL '30 days'
          AND c.status != 'superseded'
-         AND v.is_active = true
+         AND v.status = 'active'
          AND v.contact_email IS NOT NULL
-       ORDER BY c.expiry_date ASC`,
+       ORDER BY c.expiration_date ASC`,
     );
   } catch (e) {
     summary.errors.push(`query expiring certs: ${String(e)}`);
@@ -291,9 +292,10 @@ export async function runExpirationSweep(db: Db, events: EventBus): Promise<Swee
          COALESCE(v.missing_requirements, 'Missing required certificate(s)') AS missing_requirements,
          COALESCE(p.noncompliance_reminder_frequency_days, 7)::int        AS reminder_frequency_days
        FROM coi_vendors v
-       JOIN coi_properties p ON p.id = v.property_id
+       JOIN coi_vendor_properties vp ON vp.vendor_id = v.id
+       JOIN coi_properties p ON p.id = vp.property_id
        WHERE v.is_compliant = false
-         AND v.is_active = true
+         AND v.status = 'active'
          AND v.contact_email IS NOT NULL`,
     );
   } catch (e) {

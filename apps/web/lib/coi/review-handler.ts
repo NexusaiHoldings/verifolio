@@ -8,6 +8,8 @@
  * re-trigger compliance scoring.
  */
 
+import type { AcordExtractionResult } from "./acord-schema";
+
 // ── DB pool (same pattern as apps/web/lib/db.ts) ─────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _pool: any = null;
@@ -103,13 +105,15 @@ export interface ReviewResult {
 // ── Queries ───────────────────────────────────────────────────────────────────
 
 export async function listPendingReviews(): Promise<PendingReview[]> {
+  // policy_type comes from the extraction's form_type (coi_extractions stores
+  // the ACORD payload as a jsonb blob, not flat columns).
   return dbQuery<PendingReview>(`
     SELECT
       rq.id,
       rq.extraction_id,
       rq.vendor_id,
       v.name          AS vendor_name,
-      ce.policy_type,
+      ce.form_type    AS policy_type,
       rq.created_at   AS submitted_at,
       rq.confidence_score,
       rq.escalation_reason,
@@ -122,40 +126,146 @@ export async function listPendingReviews(): Promise<PendingReview[]> {
   `);
 }
 
+/** Parse a jsonb extraction_data column (node-pg may hand back an object or a string). */
+function parseExtraction(raw: unknown): AcordExtractionResult | null {
+  if (!raw) return null;
+  try {
+    return (typeof raw === "string" ? JSON.parse(raw) : raw) as AcordExtractionResult;
+  } catch {
+    return null;
+  }
+}
+
+function numToStr(v: number | null | undefined): string | null {
+  return typeof v === "number" && !Number.isNaN(v) ? String(v) : null;
+}
+
+interface FlatCert {
+  policy_type: string | null;
+  insured_name: string | null;
+  policy_number: string | null;
+  effective_date: string | null;
+  expiration_date: string | null;
+  general_liability_limit: string | null;
+  auto_liability_limit: string | null;
+  workers_comp_limit: string | null;
+  umbrella_limit: string | null;
+  additional_insured: boolean | null;
+  certificate_holder: string | null;
+}
+
+/** Flatten an ACORD extraction payload to the COI columns the review UI +
+ *  coi_certificates use. Single source of truth for the jsonb → flat mapping. */
+function flattenExtraction(d: AcordExtractionResult | null): FlatCert {
+  const gl = d?.general_liability ?? null;
+  const auto = d?.automobile_liability ?? null;
+  const wc = d?.workers_compensation ?? null;
+  const umb = d?.umbrella_excess ?? null;
+  return {
+    policy_type: d?.form_type ?? null,
+    insured_name: d?.named_insured?.name?.value ?? null,
+    policy_number: gl?.policy_number?.value ?? auto?.policy_number?.value ?? null,
+    effective_date: gl?.effective_date?.value ?? null,
+    expiration_date: gl?.expiration_date?.value ?? null,
+    general_liability_limit: numToStr(gl?.limits?.each_occurrence?.value),
+    auto_liability_limit: numToStr(auto?.limits?.combined_single_limit?.value),
+    workers_comp_limit: numToStr(wc?.limits?.el_each_accident?.value),
+    umbrella_limit: numToStr(umb?.limits?.each_occurrence?.value),
+    additional_insured: gl?.additional_insured?.value ?? null,
+    certificate_holder: d?.certificate_holder?.name?.value ?? null,
+  };
+}
+
 export async function getExtractionDetail(
   extractionId: string,
 ): Promise<ExtractionDetail | null> {
-  const rows = await dbQuery<ExtractionDetail>(
+  // The detailed COI fields live in coi_extractions.extraction_data (a jsonb
+  // AcordExtractionResult) at review time — they are NOT flat columns and are
+  // only flattened onto coi_certificates on promotion. Read the jsonb + the
+  // queue row, then map to the flat ExtractionDetail shape the page expects.
+  const rows = await dbQuery<{
+    id: string;
+    extraction_id: string;
+    vendor_id: string | null;
+    vendor_name: string | null;
+    submitted_at: string;
+    confidence_score: number;
+    escalation_reason: string | null;
+    status: ReviewStatus;
+    reviewer_notes: string | null;
+    form_type: string | null;
+    extraction_data: unknown;
+    document_url: string | null;
+  }>(
     `SELECT
       rq.id,
       rq.extraction_id,
       rq.vendor_id,
-      v.name              AS vendor_name,
-      ce.policy_type,
-      rq.created_at       AS submitted_at,
+      v.name            AS vendor_name,
+      rq.created_at     AS submitted_at,
       rq.confidence_score,
       rq.escalation_reason,
       rq.status,
-      ce.document_url,
-      ce.insured_name,
-      ce.policy_number,
-      ce.effective_date::text   AS effective_date,
-      ce.expiration_date::text  AS expiration_date,
-      ce.general_liability_limit,
-      ce.auto_liability_limit,
-      ce.workers_comp_limit,
-      ce.umbrella_limit,
-      ce.additional_insured,
-      ce.certificate_holder,
-      ce.field_confidences,
-      rq.reviewer_notes
+      rq.reviewer_notes,
+      ce.form_type,
+      ce.extraction_data,
+      cc.file_url       AS document_url
     FROM coi_review_queue rq
-    LEFT JOIN coi_extractions ce ON ce.id = rq.extraction_id
-    LEFT JOIN coi_vendors     v  ON v.id  = rq.vendor_id
+    LEFT JOIN coi_extractions  ce ON ce.id = rq.extraction_id
+    LEFT JOIN coi_certificates cc ON cc.id = ce.certificate_id
+    LEFT JOIN coi_vendors      v  ON v.id  = rq.vendor_id
     WHERE rq.extraction_id = $1`,
     [extractionId],
   );
-  return rows[0] ?? null;
+  const row = rows[0];
+  if (!row) return null;
+
+  const d = parseExtraction(row.extraction_data);
+  const gl = d?.general_liability ?? null;
+  const auto = d?.automobile_liability ?? null;
+  const wc = d?.workers_compensation ?? null;
+  const umb = d?.umbrella_excess ?? null;
+
+  const field_confidences: Record<string, number> = {};
+  if (d) {
+    const add = (k: string, c: number | undefined) => {
+      if (typeof c === "number") field_confidences[k] = c;
+    };
+    add("insured_name", d.named_insured?.name?.confidence);
+    add("certificate_holder", d.certificate_holder?.name?.confidence);
+    add("policy_number", gl?.policy_number?.confidence);
+    add("effective_date", gl?.effective_date?.confidence);
+    add("expiration_date", gl?.expiration_date?.confidence);
+    add("general_liability_limit", gl?.limits?.each_occurrence?.confidence);
+    add("auto_liability_limit", auto?.limits?.combined_single_limit?.confidence);
+    add("workers_comp_limit", wc?.limits?.el_each_accident?.confidence);
+    add("umbrella_limit", umb?.limits?.each_occurrence?.confidence);
+  }
+
+  return {
+    id: row.id,
+    extraction_id: row.extraction_id,
+    vendor_id: row.vendor_id,
+    vendor_name: row.vendor_name,
+    policy_type: row.form_type,
+    submitted_at: row.submitted_at,
+    confidence_score: row.confidence_score,
+    escalation_reason: row.escalation_reason,
+    status: row.status,
+    document_url: row.document_url,
+    insured_name: d?.named_insured?.name?.value ?? null,
+    policy_number: gl?.policy_number?.value ?? auto?.policy_number?.value ?? null,
+    effective_date: gl?.effective_date?.value ?? null,
+    expiration_date: gl?.expiration_date?.value ?? null,
+    general_liability_limit: numToStr(gl?.limits?.each_occurrence?.value),
+    auto_liability_limit: numToStr(auto?.limits?.combined_single_limit?.value),
+    workers_comp_limit: numToStr(wc?.limits?.el_each_accident?.value),
+    umbrella_limit: numToStr(umb?.limits?.each_occurrence?.value),
+    additional_insured: gl?.additional_insured?.value ?? null,
+    certificate_holder: d?.certificate_holder?.name?.value ?? null,
+    field_confidences: Object.keys(field_confidences).length > 0 ? field_confidences : null,
+    reviewer_notes: row.reviewer_notes,
+  };
 }
 
 export async function submitReview(
@@ -189,52 +299,56 @@ export async function submitReview(
 
     if (submission.decision === "approve") {
       const c = submission.corrected_fields;
+
+      // Load the extraction's jsonb payload + its linked certificate. The flat
+      // COI values are derived from the jsonb (not flat columns on
+      // coi_extractions); reviewer corrected_fields override the derived values.
+      const exRows = await pool.query(
+        `SELECT ce.extraction_data, ce.certificate_id,
+                cc.vendor_id, cc.file_url
+         FROM coi_extractions ce
+         LEFT JOIN coi_certificates cc ON cc.id = ce.certificate_id
+         WHERE ce.id = $1`,
+        [submission.extraction_id],
+      );
+      const ex = (exRows.rows[0] ?? null) as
+        | { extraction_data: unknown; certificate_id: string | null; vendor_id: string | null; file_url: string | null }
+        | null;
+      const base = flattenExtraction(parseExtraction(ex?.extraction_data));
+      const aiText =
+        c.additional_insured ??
+        (base.additional_insured == null ? null : base.additional_insured ? "yes" : "no");
+
       const certRows = await pool.query(
         `INSERT INTO coi_certificates (
-           id, extraction_id, vendor_id, policy_type,
+           extraction_id, vendor_id, policy_type,
            insured_name, policy_number,
            effective_date, expiration_date,
            general_liability_limit, auto_liability_limit,
            workers_comp_limit, umbrella_limit,
            additional_insured, certificate_holder, document_url,
            status, promoted_at, promoted_by
+         ) VALUES (
+           $1, $2, $3, $4, $5, ($6)::date, ($7)::date, $8, $9, $10, $11, $12, $13, $14,
+           'active', NOW(), $15
          )
-         SELECT
-           gen_random_uuid(),
-           ce.id,
-           rq.vendor_id,
-           COALESCE($1,  ce.policy_type),
-           COALESCE($2,  ce.insured_name),
-           COALESCE($3,  ce.policy_number),
-           COALESCE(($4)::date,  ce.effective_date),
-           COALESCE(($5)::date,  ce.expiration_date),
-           COALESCE($6,  ce.general_liability_limit),
-           COALESCE($7,  ce.auto_liability_limit),
-           COALESCE($8,  ce.workers_comp_limit),
-           COALESCE($9,  ce.umbrella_limit),
-           ce.additional_insured,
-           COALESCE($10, ce.certificate_holder),
-           ce.document_url,
-           'active',
-           NOW(),
-           $11
-         FROM coi_extractions ce
-         JOIN coi_review_queue rq ON rq.extraction_id = ce.id
-         WHERE ce.id = $12
          RETURNING id`,
         [
-          c.policy_type ?? null,
-          c.insured_name ?? null,
-          c.policy_number ?? null,
-          c.effective_date ?? null,
-          c.expiration_date ?? null,
-          c.general_liability_limit ?? null,
-          c.auto_liability_limit ?? null,
-          c.workers_comp_limit ?? null,
-          c.umbrella_limit ?? null,
-          c.certificate_holder ?? null,
-          submission.reviewer_id,
           submission.extraction_id,
+          ex?.vendor_id ?? null,
+          c.policy_type ?? base.policy_type,
+          c.insured_name ?? base.insured_name,
+          c.policy_number ?? base.policy_number,
+          c.effective_date ?? base.effective_date,
+          c.expiration_date ?? base.expiration_date,
+          c.general_liability_limit ?? base.general_liability_limit,
+          c.auto_liability_limit ?? base.auto_liability_limit,
+          c.workers_comp_limit ?? base.workers_comp_limit,
+          c.umbrella_limit ?? base.umbrella_limit,
+          aiText,
+          c.certificate_holder ?? base.certificate_holder,
+          ex?.file_url ?? null,
+          submission.reviewer_id,
         ],
       );
 

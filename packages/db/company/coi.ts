@@ -152,4 +152,18 @@ CREATE INDEX IF NOT EXISTS idx_coi_vendors_org_id ON coi_vendors(org_id);
 CREATE INDEX IF NOT EXISTS idx_coi_properties_org_id ON coi_properties(org_id);
 CREATE INDEX IF NOT EXISTS idx_coi_vendor_properties_vendor ON coi_vendor_properties(vendor_id);
 CREATE INDEX IF NOT EXISTS idx_coi_vendor_properties_property ON coi_vendor_properties(property_id);
+
+-- reconciliation 2026-06-23: the reminder-scheduler + score-tool read columns the
+-- original vendor/property/template DDL never defined (schema-divergence across
+-- features). Add them with safe defaults so those code paths are schema-coherent.
+-- Vendor compliance flags (the non-compliance reminder branch reads these).
+ALTER TABLE coi_vendors ADD COLUMN IF NOT EXISTS is_compliant BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE coi_vendors ADD COLUMN IF NOT EXISTS missing_requirements TEXT;
+-- Per-property reminder configuration (the expiration-sweep reads these).
+ALTER TABLE coi_properties ADD COLUMN IF NOT EXISTS escalation_email TEXT;
+ALTER TABLE coi_properties ADD COLUMN IF NOT EXISTS escalation_threshold_days INTEGER NOT NULL DEFAULT 7;
+ALTER TABLE coi_properties ADD COLUMN IF NOT EXISTS reminders_enabled BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE coi_properties ADD COLUMN IF NOT EXISTS noncompliance_reminder_frequency_days INTEGER NOT NULL DEFAULT 7;
+-- Default-template flag (the agent score-tool resolves a default template).
+ALTER TABLE coi_compliance_templates ADD COLUMN IF NOT EXISTS is_default BOOLEAN NOT NULL DEFAULT false;
 `;

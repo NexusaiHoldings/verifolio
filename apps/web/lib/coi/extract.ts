@@ -416,6 +416,27 @@ async function persistResults(
     throw new Error("Failed to create coi_extractions row");
   }
 
+  // Enqueue for human review when the extraction is low-confidence. This was
+  // the missing wire: nothing ever populated coi_review_queue, so the
+  // /review-queue surface was always empty. Best-effort — a failed enqueue must
+  // not fail the extraction itself.
+  if (result.needs_human_review) {
+    const reason =
+      result.low_confidence_fields.length > 0
+        ? `Low-confidence fields: ${result.low_confidence_fields.slice(0, 8).join(", ")}`
+        : `Overall confidence ${(result.overall_confidence * 100).toFixed(0)}% below threshold`;
+    try {
+      await dbQuery(
+        `INSERT INTO coi_review_queue
+           (extraction_id, status, confidence_score, escalation_reason, created_at)
+         VALUES ($1, 'pending', $2, $3, NOW())`,
+        [extractionId, result.overall_confidence, reason],
+      );
+    } catch (err) {
+      console.error(`[coi/extract] failed to enqueue review for ${extractionId}: ${String(err)}`);
+    }
+  }
+
   return { certificateId, extractionId };
 }
 
