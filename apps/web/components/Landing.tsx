@@ -34,7 +34,8 @@ export async function Landing(): Promise<JSX.Element> {
 
   const heroCopy = (
     <div style={{ flex: "1 1 360px", minWidth: 0 }}>
-      <h1 style={{ fontSize: "2.4rem", lineHeight: 1.12, marginBottom: "0.75rem" }}>
+      <span className="eyebrow">{name}</span>
+      <h1 style={{ fontSize: "2.6rem", lineHeight: 1.1, marginBottom: "0.75rem", letterSpacing: "-0.02em" }}>
         {headline}
       </h1>
       <p
@@ -83,8 +84,9 @@ export async function Landing(): Promise<JSX.Element> {
                 minWidth: 0,
                 width: "100%",
                 maxWidth: 560,
-                borderRadius: 14,
+                borderRadius: "var(--substrate-radius-lg)",
                 border: "1px solid var(--substrate-border)",
+                boxShadow: "var(--substrate-shadow-lg)",
                 aspectRatio: "3 / 2",
                 objectFit: "cover",
               }}
@@ -132,15 +134,7 @@ export async function Landing(): Promise<JSX.Element> {
             }}
           >
             {features.map((f, i) => (
-              <div
-                key={i}
-                style={{
-                  border: "1px solid var(--substrate-border)",
-                  borderRadius: 12,
-                  padding: "20px 22px",
-                  background: "var(--substrate-surface, transparent)",
-                }}
-              >
+              <div key={i} className="feature-card">
                 <h3 style={{ fontSize: "1.1rem", marginBottom: "0.5rem", lineHeight: 1.25 }}>
                   {f.title}
                 </h3>
@@ -155,11 +149,10 @@ export async function Landing(): Promise<JSX.Element> {
 
       {homeConfig.closingHeadline ? (
         <section
+          className="cta-band"
           style={{
             margin: "48px 0 24px",
-            padding: "36px 28px",
-            borderRadius: 14,
-            border: "1px solid var(--substrate-border)",
+            padding: "44px 28px",
             textAlign: "center",
           }}
         >

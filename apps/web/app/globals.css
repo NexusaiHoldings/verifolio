@@ -31,10 +31,22 @@
   --substrate-surface: #fafafa;
   --substrate-surface-2: #f4f4f4;
   --substrate-radius: 8px;
+  --substrate-radius-lg: 16px;
   --substrate-control-h: 38px;
   --substrate-max-width: 1080px;
   --substrate-font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --substrate-font-heading: var(--substrate-font-body);
+
+  /* Elevation + motion (design-system-enrichment-001). These are NOT color
+   * tokens, so the per-company ThemeContract override never touches them —
+   * every company, themed or generic, inherits the same depth + motion. The
+   * design-QA gate scored depth/motion near zero on the flat baseline; these
+   * give cards real surface and interactive elements real feedback. */
+  --substrate-shadow-sm: 0 1px 2px rgba(17, 17, 17, 0.06);
+  --substrate-shadow: 0 4px 12px rgba(17, 17, 17, 0.08), 0 1px 3px rgba(17, 17, 17, 0.05);
+  --substrate-shadow-lg: 0 16px 40px rgba(17, 17, 17, 0.14), 0 4px 12px rgba(17, 17, 17, 0.08);
+  --substrate-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --substrate-dur: 0.18s;
 }
 
 * {
@@ -159,16 +171,28 @@ main .btn {
   color: var(--substrate-accent-text);
   cursor: pointer;
   vertical-align: middle;
-  transition: opacity 0.12s ease;
+  box-shadow: var(--substrate-shadow-sm);
+  transition: transform var(--substrate-dur) var(--substrate-ease),
+    box-shadow var(--substrate-dur) var(--substrate-ease),
+    opacity var(--substrate-dur) var(--substrate-ease);
 }
 main button:hover,
 main .btn:hover {
-  opacity: 0.85;
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: var(--substrate-shadow);
   text-decoration: none;
+}
+main button:active,
+main .btn:active {
+  transform: translateY(0);
+  box-shadow: var(--substrate-shadow-sm);
 }
 main button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 /* Secondary button variant */
 main button.secondary,
@@ -251,6 +275,21 @@ main .card {
   background: var(--substrate-bg);
   padding: 1.25rem;
   margin-bottom: 1rem;
+  box-shadow: var(--substrate-shadow-sm);
+}
+/* Interactive / clickable cards lift on hover. Add class="card lift" (or
+   .feature-card, which is .lift by default) to opt a card into the motion. */
+main .card.lift,
+main .feature-card {
+  transition: transform var(--substrate-dur) var(--substrate-ease),
+    box-shadow var(--substrate-dur) var(--substrate-ease),
+    border-color var(--substrate-dur) var(--substrate-ease);
+}
+main .card.lift:hover,
+main .feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--substrate-shadow-lg);
+  border-color: var(--substrate-border-strong);
 }
 main .muted {
   color: var(--substrate-muted);
@@ -281,6 +320,91 @@ main code {
   border-radius: 4px;
   padding: 0.1rem 0.35rem;
   font-size: 0.9em;
+}
+
+/* ── Design-excellence layer (design-system-enrichment-001) ─────────────────
+ * Reusable, brand-aware building blocks for first-class pages: an eyebrow
+ * kicker, status pills, an elevated surface, a feature-card base, and an
+ * accent-tinted CTA band. The §3A design-QA gate scores depth, motion,
+ * hierarchy and content-craft — these give agents (and Landing.tsx) the
+ * primitives to clear the bar without per-company CSS. All accent-derived
+ * colors use color-mix so they track each company's ThemeContract. */
+main .eyebrow {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--substrate-accent);
+  margin-bottom: 0.6rem;
+}
+main .pill,
+main .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--substrate-accent) 12%, transparent);
+  color: var(--substrate-accent);
+  border: 1px solid color-mix(in srgb, var(--substrate-accent) 24%, transparent);
+}
+main .pill.success {
+  background: color-mix(in srgb, var(--substrate-success) 14%, transparent);
+  color: var(--substrate-success);
+  border-color: color-mix(in srgb, var(--substrate-success) 28%, transparent);
+}
+main .pill.danger {
+  background: color-mix(in srgb, var(--substrate-danger) 12%, transparent);
+  color: var(--substrate-danger);
+  border-color: color-mix(in srgb, var(--substrate-danger) 26%, transparent);
+}
+/* An elevated surface panel — more presence than .card for primary content. */
+main .surface {
+  border: 1px solid var(--substrate-border);
+  border-radius: var(--substrate-radius-lg);
+  background: var(--substrate-bg);
+  box-shadow: var(--substrate-shadow);
+  padding: 1.75rem;
+  margin-bottom: 1.25rem;
+}
+/* Feature card base (Landing + feature grids). Hover-lift defined above. */
+main .feature-card {
+  border: 1px solid var(--substrate-border);
+  border-radius: var(--substrate-radius-lg);
+  background: var(--substrate-surface);
+  box-shadow: var(--substrate-shadow-sm);
+  padding: 1.5rem;
+}
+/* Accent-tinted CTA band — reads as a deliberate closing section, not a
+   bare bordered box. Subtle gradient from the brand accent. */
+main .cta-band {
+  border: 1px solid color-mix(in srgb, var(--substrate-accent) 22%, var(--substrate-border));
+  border-radius: var(--substrate-radius-lg);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--substrate-accent) 10%, var(--substrate-bg)),
+    color-mix(in srgb, var(--substrate-accent) 3%, var(--substrate-bg))
+  );
+  box-shadow: var(--substrate-shadow);
+}
+/* Respect reduced-motion: kill transforms/transitions for users who ask. */
+@media (prefers-reduced-motion: reduce) {
+  main button,
+  main .btn,
+  main .card.lift,
+  main .feature-card {
+    transition: none;
+  }
+  main button:hover,
+  main .btn:hover,
+  main .card.lift:hover,
+  main .feature-card:hover {
+    transform: none;
+  }
 }
 
 /* ── Site footer — rendered OUTSIDE <main> (so not covered by the rules above).
