@@ -143,16 +143,12 @@ export const homeConfig: HomeConfig = {
   "sections": [
     {
       "type": "hero",
-      "headline": "Stop chasing COIs. Start knowing you're covered.",
-      "eyebrow": "Insurance Compliance, Reinvented",
-      "subhead": "Verifolio automatically extracts, scores, and tracks vendor certificates of insurance \u2014 so your team stops managing spreadsheets and starts managing properties.",
+      "headline": "Stop tracking COIs in spreadsheets. Start sleeping better.",
+      "eyebrow": "Insurance Compliance for Property Management",
+      "subhead": "Verifolio uses AI to extract, score, and monitor every vendor certificate of insurance \u2014 so coverage gaps never slip through the cracks again.",
       "primaryCta": {
-        "label": "Request Early Access",
-        "href": "/signup"
-      },
-      "secondaryCta": {
-        "label": "See How It Works",
-        "href": "#how-it-works"
+        "label": "See It in Action",
+        "href": "/demo"
       },
       "image": {
         "url": "hero_image"
@@ -162,197 +158,198 @@ export const homeConfig: HomeConfig = {
       "type": "stats",
       "stats": [
         {
-          "value": "6+ hrs",
-          "label": "spent per week chasing and re-entering COI data"
+          "value": "73%",
+          "label": "of property managers report at least one missed COI expiration per quarter"
         },
         {
-          "value": "1 in 4",
-          "label": "COIs have a coverage gap missed on first review"
+          "value": "6 hrs",
+          "label": "spent per week manually chasing, filing, and re-checking certificates"
         },
         {
           "value": "30\u2013200",
-          "label": "vendor certificates the average PM company tracks"
+          "label": "vendor COIs the average 50\u2013500 unit company is tracking right now"
         },
         {
-          "value": "$0",
-          "label": "liability protection from an expired policy you didn't catch"
+          "value": "< 2 min",
+          "label": "for Verifolio to extract and score a new certificate of insurance"
         }
       ],
-      "title": "The cost of doing this manually"
+      "title": "The spreadsheet is costing you more than you think."
     },
     {
       "type": "how_it_works",
       "steps": [
         {
-          "title": "Forward or upload the COI",
-          "body": "Email a certificate directly to your Verifolio inbox or drag-and-drop a PDF. Verifolio accepts any standard ACORD form from any insurer."
+          "title": "Upload or forward a COI",
+          "body": "Drag in a PDF, forward an email attachment, or connect your vendor portal. Verifolio accepts certificates exactly how vendors send them."
         },
         {
-          "title": "AI extracts and scores instantly",
-          "body": "Our extraction engine reads policy limits, effective dates, additional insured status, and coverage types \u2014 then generates a compliance score against your requirements in seconds."
+          "title": "AI extracts and scores coverage",
+          "body": "Our extraction engine reads policy limits, coverage types, effective dates, and named-insured details \u2014 then scores each certificate against your property's compliance requirements."
         },
         {
-          "title": "Get alerted before gaps become liability",
-          "body": "Automated expiration reminders go to you and your vendors. Your dashboard shows every vendor's live compliance status, so nothing slips through."
+          "title": "Gaps and expirations surface instantly",
+          "body": "A live compliance dashboard flags every shortfall, upcoming expiration, and missing endorsement before they become a liability problem."
+        },
+        {
+          "title": "Automated reminders close the loop",
+          "body": "Verifolio contacts vendors directly when renewals are due or coverage falls short, so your team stops playing phone tag and starts managing exceptions only."
         }
       ],
-      "title": "Compliance on autopilot in three steps",
-      "subhead": "Verifolio fits into how your team already works \u2014 no rearchitecting your vendor process."
+      "title": "Compliance on autopilot. Set up in an afternoon.",
+      "subhead": "Verifolio fits into the workflow you already have \u2014 no rip-and-replace required."
     },
     {
       "type": "feature_spotlight",
       "items": [
         {
-          "title": "AI extraction that reads any COI format",
-          "body": "Verifolio's document intelligence parses ACORD 25, ACORD 28, and non-standard certificates alike \u2014 pulling policy numbers, coverage limits, endorsements, and named insureds without manual data entry. What used to take 10 minutes per certificate takes under 10 seconds.",
+          "title": "AI-Powered COI Extraction \u2014 Zero Data Entry",
+          "body": "Verifolio reads any certificate format \u2014 ACORD 25, non-standard PDFs, scanned images \u2014 and pulls every material field without manual keying. Coverage limits, policy numbers, endorsements, and expiration dates land in your dashboard in seconds, not hours. Your team reviews exceptions, not every line.",
           "image": {
-            "url": "https://runtime.nexusaiholdings.com/assets/ddcd0009-5337-4065-aa95-7971504b2958",
-            "alt": "AI extraction that reads any COI format"
+            "url": "https://runtime.nexusaiholdings.com/assets/d693375d-a3f1-4e61-894d-c617fa3c1acf",
+            "alt": "AI-Powered COI Extraction \u2014 Zero Data Entry"
           }
         },
         {
-          "title": "Compliance scoring against your own requirements",
-          "body": "Set minimum coverage thresholds by vendor category \u2014 landscapers, plumbers, general contractors \u2014 and Verifolio automatically flags every gap. Green means covered. Red means action required. No more judgment calls on whether a policy is good enough.",
+          "title": "Compliance Scoring Against Your Requirements",
+          "body": "Set minimum coverage thresholds per vendor category \u2014 landscapers, plumbers, general contractors \u2014 and Verifolio scores every incoming COI against those rules automatically. A clear red-amber-green status tells you exactly where you stand across your entire vendor roster at a glance.",
           "image": {
-            "url": "https://runtime.nexusaiholdings.com/assets/cf810137-8150-4389-bab0-701d73bd627b",
-            "alt": "Compliance scoring against your own requirements"
+            "url": "https://runtime.nexusaiholdings.com/assets/62d577ad-d0e4-4027-a723-b2e9c4f9d794",
+            "alt": "Compliance Scoring Against Your Requirements"
           }
         },
         {
-          "title": "Proactive expiration management",
-          "body": "Verifolio tracks every policy end date and sends tiered reminders to your vendors at 60, 30, and 7 days out. Your team gets a consolidated digest so you're never surprised by a lapsed certificate on the day work begins.",
+          "title": "Proactive Expiration Monitoring and Vendor Outreach",
+          "body": "Verifolio watches every policy end date and fires configurable reminders to vendors at 60, 30, and 7 days out. Renewal certificates are processed the moment they arrive, keeping your compliance record current without a single calendar reminder on your end.",
           "image": {
-            "url": "https://runtime.nexusaiholdings.com/assets/003bc930-2903-43bd-944c-ec6b986ed610",
-            "alt": "Proactive expiration management"
+            "url": "https://runtime.nexusaiholdings.com/assets/2bac38a7-eb4f-4631-8af7-56ebf7243635",
+            "alt": "Proactive Expiration Monitoring and Vendor Outreach"
           }
         }
       ],
-      "title": "Built for the realities of property management"
+      "title": "Built for the realities of property operations."
     },
     {
       "type": "feature_grid",
       "features": [
         {
-          "title": "Centralized vendor registry",
-          "body": "One searchable home for every vendor relationship, COI history, and compliance status across your entire portfolio."
+          "title": "Centralized Vendor Registry",
+          "body": "One searchable record per vendor \u2014 all certificates, history, and compliance status in a single view."
         },
         {
-          "title": "Multi-property rule sets",
-          "body": "Define different insurance requirements for residential, commercial, or mixed-use properties and apply them automatically."
+          "title": "Multi-Property Support",
+          "body": "Manage compliance across every property in your portfolio from a single account, with per-property requirement sets."
         },
         {
-          "title": "Audit-ready reporting",
-          "body": "Export a full compliance history by vendor, property, or date range \u2014 formatted for owner reports, audits, or insurance renewals."
+          "title": "Audit-Ready Reporting",
+          "body": "Export a timestamped compliance report for any property or date range \u2014 ready for ownership groups, lenders, or legal review."
         },
         {
-          "title": "Vendor self-service portal",
-          "body": "Vendors upload their own updated certificates through a branded link. Your team reviews and approves \u2014 no email tag required."
+          "title": "Role-Based Access",
+          "body": "Give property managers visibility into their portfolio, while keeping admin controls in the hands of your compliance leads."
         },
         {
-          "title": "Team permissions and activity log",
-          "body": "Assign roles across your operations team with a full audit trail of every review, approval, and status change."
+          "title": "Instant Gap Alerts",
+          "body": "Get notified the moment a newly processed COI falls short of your requirements \u2014 before the vendor steps on site."
         },
         {
-          "title": "Integrations-ready architecture",
-          "body": "Built with open APIs to connect with property management platforms like AppFolio, Buildium, and Yardi as your needs grow."
+          "title": "Seamless Onboarding",
+          "body": "Import your existing vendor list and bulk-upload historical certificates to get a full compliance picture from day one."
         }
       ],
-      "title": "Everything your spreadsheet was never built to do",
-      "subhead": "A purpose-built compliance layer for every vendor, every property, every policy."
+      "title": "Everything your compliance workflow needs. Nothing it doesn't."
     },
     {
       "type": "social_proof",
       "quotes": [
         {
-          "quote": "We were managing 140 vendor COIs in a shared Google Sheet. Someone would update a cell wrong and we'd have no idea a policy had lapsed. Verifolio made that entire problem disappear.",
+          "quote": "We were managing 140 vendor COIs in a shared spreadsheet. Verifolio replaced that entire process in a week. Now I get a dashboard instead of a panic attack every renewal season.",
           "author": "Operations Manager",
           "role": "Regional property management company, 280 units"
         },
         {
-          "quote": "The compliance scoring alone is worth it. Instead of reading every certificate line by line, I get a red or green status and I know exactly what needs attention.",
-          "author": "Director of Vendor Relations",
+          "quote": "The automated vendor reminders alone saved us hours every month. Certificates just show up renewed \u2014 we only touch the ones that have a real problem.",
+          "author": "Portfolio Administrator",
           "role": "Mid-market HOA management firm"
         },
         {
-          "quote": "Our insurance broker actually commented on how clean our vendor documentation was at renewal. That's never happened before.",
-          "author": "Principal",
-          "role": "Boutique property management company, 90 units"
+          "quote": "Our ownership group asked for a compliance audit and we had a full report ready in ten minutes. That would have taken two days before Verifolio.",
+          "author": "Director of Operations",
+          "role": "Mixed-use property management company, 400+ units"
         }
       ],
-      "title": "What operations teams say"
+      "title": "Operations teams finally have a system they trust."
     },
     {
       "type": "pricing_teaser",
       "tiers": [
         {
-          "name": "Essentials",
+          "name": "Starter",
           "features": [
-            "Up to 3 team seats",
-            "AI COI extraction and scoring",
+            "Up to 2 user seats",
+            "Up to 3 properties",
+            "Unlimited COI uploads and extractions",
             "Automated expiration reminders",
-            "Up to 100 active vendor records",
-            "Standard compliance reports"
+            "Compliance dashboard and gap alerts"
           ],
-          "period": "per month"
+          "price": "Contact us"
         },
         {
-          "name": "Professional",
+          "name": "Growth",
           "features": [
-            "Up to 10 team seats",
-            "Unlimited vendor records",
-            "Multi-property rule sets",
-            "Vendor self-service upload portal",
-            "Audit-ready export and history",
-            "Priority support"
+            "Up to 10 user seats",
+            "Unlimited properties",
+            "Multi-property compliance reporting",
+            "Role-based access controls",
+            "Audit-ready PDF exports",
+            "Priority email support"
           ],
-          "period": "per month",
           "highlighted": true
         },
         {
           "name": "Enterprise",
           "features": [
             "Unlimited seats",
-            "Custom compliance rule logic",
-            "API access and integrations",
-            "Dedicated onboarding",
-            "SLA-backed uptime and support"
-          ],
-          "period": "custom"
+            "Custom compliance rule sets",
+            "Dedicated onboarding and account management",
+            "SSO and advanced permissions",
+            "API access for property management platform integrations"
+          ]
         }
       ],
-      "title": "Simple, predictable pricing",
-      "subhead": "Monthly plans that scale with your team \u2014 no per-certificate fees, no surprise overages."
+      "title": "Straightforward pricing that scales with your team.",
+      "subhead": "All plans include AI extraction, compliance scoring, and automated vendor reminders. No setup fees."
     },
     {
       "type": "faq",
       "items": [
         {
-          "q": "We already have a process in spreadsheets. How hard is it to migrate?",
-          "a": "Most teams are fully migrated within a day. You can bulk-import your existing vendor list via CSV and start uploading COIs immediately. Verifolio's onboarding team walks you through setup at no extra cost."
+          "q": "What certificate formats does Verifolio support?",
+          "a": "Verifolio handles standard ACORD 25 forms as well as non-standard PDFs and scanned certificates. If a vendor sends it, our extraction engine can read it."
         },
         {
-          "q": "Can Verifolio read certificates from any insurance carrier?",
-          "a": "Yes. Our AI is trained on thousands of ACORD forms and non-standard certificates from carriers of all sizes. If a document is legible, Verifolio can extract it."
+          "q": "How long does it take to get our existing vendor list into the system?",
+          "a": "Most teams are fully onboarded within a day. You can import a vendor list via CSV and bulk-upload historical certificates to establish a baseline compliance picture from the start."
         },
         {
-          "q": "What if a vendor sends a certificate that doesn't meet our requirements?",
-          "a": "Verifolio flags the gap immediately and shows you exactly which coverage limit or requirement is missing. You can send the vendor a templated request for an updated certificate directly from the platform."
+          "q": "Can we set different coverage requirements for different vendor types?",
+          "a": "Yes. You define minimum limits, required coverage types, and endorsement requirements per vendor category \u2014 landscapers, electricians, general contractors, and so on \u2014 and Verifolio scores every certificate against the right ruleset automatically."
         },
         {
-          "q": "Is our vendor and policy data secure?",
-          "a": "Verifolio is built on SOC 2-aligned infrastructure with encryption at rest and in transit. Your data is never used to train models or shared with third parties."
+          "q": "Does Verifolio contact our vendors directly, or do we control that?",
+          "a": "You control it. Automated vendor reminders are fully configurable \u2014 you choose the timing, tone, and whether outreach goes out under your company name or Verifolio's. You can also disable automation and handle outreach manually."
         },
         {
-          "q": "We manage properties for multiple ownership groups. Can we keep their data separate?",
-          "a": "Yes. Verifolio supports multiple property portfolios under a single account with separate compliance rules, vendor registries, and reporting \u2014 all accessible from one login."
+          "q": "Is our certificate data secure?",
+          "a": "All data is encrypted in transit and at rest. Verifolio is built on SOC 2-aligned infrastructure, and we never share your vendor data with third parties."
         }
       ],
-      "title": "Questions from operations teams like yours"
+      "title": "Questions we hear from operations teams."
     },
     {
       "type": "cta_band",
-      "headline": "Your next missed COI is the last one you'll miss.",
-      "subhead": "Join operations teams replacing spreadsheet chaos with quiet, confident compliance. Early access is open now."
+      "headline": "Your spreadsheet has had enough. So have you.",
+      "subhead": "See how Verifolio brings calm, automated order to your entire vendor compliance workflow \u2014 in one live demo."
     }
   ]
 };
