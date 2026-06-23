@@ -125,7 +125,7 @@ function HowItWorks(s: HowItWorksSection): JSX.Element {
           <div key={i} className="card lift" style={{ marginBottom: 0 }}>
             <div className="pill" style={{ marginBottom: 14 }}>Step {i + 1}</div>
             <h3 style={{ fontSize: "1.15rem", marginBottom: "0.5rem", lineHeight: 1.25 }}>{step.title}</h3>
-            <p style={{ color: "var(--substrate-muted)", fontSize: "0.98rem", lineHeight: 1.55 }}>{step.body}</p>
+            <p style={{ color: "var(--substrate-muted)", fontSize: "1.05rem", lineHeight: 1.65 }}>{step.body}</p>
           </div>
         ))}
       </div>
@@ -141,7 +141,7 @@ function FeatureGrid(s: FeatureGridSection): JSX.Element {
         {s.features.map((f, i) => (
           <div key={i} className="feature-card">
             <h3 style={{ fontSize: "1.1rem", marginBottom: "0.5rem", lineHeight: 1.25 }}>{f.title}</h3>
-            <p style={{ color: "var(--substrate-muted)", fontSize: "0.98rem", lineHeight: 1.55 }}>{f.body}</p>
+            <p style={{ color: "var(--substrate-muted)", fontSize: "1.05rem", lineHeight: 1.65 }}>{f.body}</p>
           </div>
         ))}
       </div>
@@ -232,7 +232,7 @@ function PricingTeaser(s: PricingTeaserSection, ctx: SectionContext): JSX.Elemen
               ) : null}
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 20px", display: "flex", flexDirection: "column", gap: 8 }}>
                 {t.features.map((f, j) => (
-                  <li key={j} style={{ color: "var(--substrate-muted)", fontSize: "0.96rem", paddingLeft: 22, position: "relative" }}>
+                  <li key={j} style={{ color: "var(--substrate-muted)", fontSize: "1rem", lineHeight: 1.5, paddingLeft: 22, position: "relative", marginBottom: 2 }}>
                     <span style={{ position: "absolute", left: 0, color: "var(--substrate-success)" }}>✓</span>{f}
                   </li>
                 ))}
