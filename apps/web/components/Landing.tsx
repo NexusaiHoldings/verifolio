@@ -12,11 +12,36 @@ import type { JSX } from "react";
 import { homeConfig } from "@/lib/home/home-config";
 import { NAV_CONFIG } from "@/lib/nav-config";
 import { getSiteMedia } from "@/lib/site-media";
+import { renderSection, type SectionContext } from "@/components/sections";
 
 export async function Landing(): Promise<JSX.Element> {
   const name = process.env.COMPANY_NAME || "Portfolio Company";
   const launchVideo = await getSiteMedia("launch_video");
   const heroImage = await getSiteMedia("hero_image");
+
+  const firstNavRoute = NAV_CONFIG.primary.find((l) => l.href !== "/");
+  const fallbackCta = homeConfig.primaryCta
+    || (firstNavRoute ? { label: firstNavRoute.label, href: firstNavRoute.href } : { label: "Get started", href: "/assistant" });
+
+  // Bespoke composition (homepage-composition-001): when the composer produced a
+  // section sequence, render it in order and let each block pull what it needs.
+  // The legacy single-layout below is the fallback for un-composed companies.
+  if (homeConfig.sections && homeConfig.sections.length > 0) {
+    const ctx: SectionContext = { heroImage, fallbackCta };
+    return (
+      <>
+        {homeConfig.sections.map((s, i) => renderSection(s, i, ctx))}
+        {launchVideo ? (
+          <video controls playsInline preload="metadata"
+            style={{ width: "100%", marginTop: "2.5rem", borderRadius: "var(--substrate-radius-lg)", border: "1px solid var(--substrate-border)", boxShadow: "var(--substrate-shadow)", aspectRatio: "16 / 9", objectFit: "cover" }}
+            src={launchVideo}>
+            Your browser does not support the video element.
+          </video>
+        ) : null}
+      </>
+    );
+  }
+
   const headline = homeConfig.headline || name;
   const subhead =
     homeConfig.subhead ||
