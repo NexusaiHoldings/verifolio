@@ -17,23 +17,63 @@
 
 import type { Db } from "@nexus/identity-and-access/api/_lib/db";
 
-/** Exact table names owned by the platform / the 16 substrate legos. */
+/**
+ * Exact table names owned by the platform / substrate / the 16 legos — enumerated
+ * from every `CREATE TABLE` in `legos/&#42;/schema/&#42;.sql` + the substrate's own
+ * `packages/db/company/{blog,site-media}.ts`. Anything NOT in this set (and not
+ * caught by a prefix below) is treated as a company PRODUCT table. Keeping this
+ * exact keeps the Product Data admin precise — it won't hide a company's own
+ * table just because it shares a word with a platform one.
+ */
 const DENY_EXACT = new Set<string>([
-  "users", "sessions", "profiles", "user_profiles",
-  "feature_flags", "system_config", "company_profiles",
-  "schema_migrations", "migrations",
-  "search_index", "file_blobs", "files",
+  // identity-and-access
+  "users", "sessions", "password_reset_tokens", "mfa_factors",
+  "mfa_recovery_codes", "oauth_identities", "login_history",
+  // profile-and-account
+  "user_profiles", "profiles", "connected_accounts", "account_export_requests",
+  // organizations-and-teams
+  "organizations", "org_members", "org_invitations", "org_audit_log",
+  // billing-and-subscriptions
+  "billing_customers", "billing_subscriptions", "billing_checkout_sessions",
+  "billing_webhook_events", "billing_usage_events", "billing_usage_summaries",
+  "billing_plan_changes", "billing_dunning_state",
+  // legal-and-compliance
   "legal_documents", "legal_acknowledgments", "cookie_consents",
+  // notifications
+  "notification_log", "notification_preferences", "web_push_subscriptions",
+  // admin-console
+  "admin_sections", "admin_audit_log", "feature_flags", "system_config",
+  // analytics-and-telemetry
+  "analytics_events", "analytics_funnels",
+  // support-and-help
+  "support_tickets", "support_messages", "support_feedback", "kb_articles",
+  // crm-and-lifecycle
+  "crm_contacts", "crm_interactions", "crm_outreach_drafts",
+  // developer-surface
+  "api_keys", "api_request_log", "webhooks",
+  // files-and-media + search
+  "file_blobs", "files", "file_extractions", "search_index", "saved_searches",
+  // social-and-engagement
+  "social_comments", "social_reactions", "social_referrals",
+  // onboarding
+  "onboarding_progress", "onboarding_sample_data_runs",
+  // memory-and-knowledge (portfolio runtime)
+  "portfolio_runtime_memory", "portfolio_knowledge_compiler_runs",
+  "portfolio_memory_forget_log",
+  // substrate-owned company-db tables (marketing/media — every company has these)
+  "blog_posts", "site_media",
+  // provisioning / migration bookkeeping
+  "company_profiles", "schema_migrations", "migrations",
 ]);
 
-/** Prefixes for platform / lego table families. */
+/**
+ * Prefixes for platform / lego table families — defense against NEW variant
+ * tables a lego adds after this snapshot. Deliberately limited to families no
+ * plausible company product table would use, so we don't hide real product data.
+ */
 const DENY_PREFIXES = [
-  "billing_", "legal_", "cookie_", "notification", "admin_", "audit_",
-  "analytics_", "page_view", "file_", "search_", "support_", "kb_",
-  "knowledge_", "crm_", "onboarding_", "api_key", "developer_", "dev_",
-  "social_", "memory_", "org_", "organization", "team", "mfa_", "oauth",
-  "session", "password", "email_verif", "migration", "user_profile", "profile",
-  "pg_", "_",
+  "billing_", "mfa_", "oauth_", "analytics_", "admin_", "notification_",
+  "portfolio_", "password_", "pg_", "_",
 ];
 
 function isExcluded(name: string): boolean {
