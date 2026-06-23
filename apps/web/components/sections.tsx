@@ -44,7 +44,10 @@ const SECTION_GAP = 72; // vertical rhythm between sections
 
 function resolveImage(img: SectionImage | undefined, ctx: SectionContext): string | null {
   if (img?.url && img.url !== "hero_image" && /^https?:\/\//.test(img.url)) return img.url;
-  if (img?.url === "hero_image" || !img) return ctx.heroImage || null;
+  // Only the literal "hero_image" token resolves to the shared hero image. A
+  // section item with NO image renders text-only — never reuse the hero across
+  // sections (that read as "generic, repetitive imagery" and tanked the score).
+  if (img?.url === "hero_image") return ctx.heroImage || null;
   return null;
 }
 
