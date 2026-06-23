@@ -23,9 +23,12 @@ interface Section {
 // The substrate's mounted admin pages — always present in the sidebar.
 const STATIC_SECTIONS: Section[] = [
   { id: "users", lego_name: "identity-and-access", section_name: "Users", section_order: 1, routes: ["/admin/users"] },
+  { id: "data", lego_name: "product-data", section_name: "Product Data", section_order: 5, routes: ["/admin/data"] },
   { id: "feature-flags", lego_name: "admin-console", section_name: "Feature Flags", section_order: 10, routes: ["/admin/feature-flags"] },
   { id: "system-config", lego_name: "admin-console", section_name: "System Config", section_order: 11, routes: ["/admin/system-config"] },
   { id: "audit-log", lego_name: "admin-console", section_name: "Audit Log", section_order: 12, routes: ["/admin/audit-log"] },
+  { id: "legal", lego_name: "legal-and-compliance", section_name: "Legal", section_order: 30, routes: ["/admin/legal"] },
+  { id: "billing", lego_name: "billing-and-subscriptions", section_name: "Billing", section_order: 40, routes: ["/admin/billing"] },
   { id: "analytics", lego_name: "analytics-and-telemetry", section_name: "Analytics", section_order: 60, routes: ["/admin/analytics"] },
 ];
 
