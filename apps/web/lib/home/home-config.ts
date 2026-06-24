@@ -148,7 +148,7 @@ export const homeConfig: HomeConfig = {
       "subhead": "Verifolio uses AI to extract, score, and monitor every vendor certificate of insurance \u2014 so coverage gaps never slip through the cracks again.",
       "primaryCta": {
         "label": "See It in Action",
-        "href": "/demo"
+        "href": "/dashboard"
       },
       "image": {
         "url": "hero_image"
