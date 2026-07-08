@@ -117,73 +117,29 @@ export const LEGOS: readonly LegoConfig[] = [
   },
   {
     "config": {
-      "properties": {
-        "default_currency": {
-          "default": "usd",
-          "description": "Default currency for new subscriptions.",
-          "enum": [
-            "usd",
-            "eur",
-            "gbp",
-            "cad",
-            "aud"
-          ],
-          "type": "string"
+      "tier_ladder": [
+        {
+          "name": "Starter",
+          "price_id": "price_1TgHUp6WMeYkDDIuZmrQrq5Y",
+          "amount": 14900,
+          "interval": "month"
         },
-        "enable_proration": {
-          "default": true,
-          "type": "boolean"
+        {
+          "name": "Professional",
+          "price_id": "price_1TgHUp6WMeYkDDIuiD5HCosa",
+          "amount": 39900,
+          "interval": "month"
         },
-        "stripe_publishable_key": {
-          "description": "Stripe publishable key (pk_live_... or pk_test_...). Secret key is read from env STRIPE_SECRET_KEY.",
-          "type": "string"
-        },
-        "tier_ladder": {
-          "description": "Pricing tiers exposed in checkout. Maps to chairman's $14/$24/$59/$99 ladder by default.",
-          "items": {
-            "properties": {
-              "amount": {
-                "description": "Cents",
-                "type": "integer"
-              },
-              "interval": {
-                "enum": [
-                  "month",
-                  "year"
-                ],
-                "type": "string"
-              },
-              "name": {
-                "type": "string"
-              },
-              "price_id": {
-                "description": "Stripe Price ID (price_...)",
-                "type": "string"
-              }
-            },
-            "required": [
-              "name",
-              "price_id",
-              "amount",
-              "interval"
-            ],
-            "type": "object"
-          },
-          "type": "array"
-        },
-        "trial_days": {
-          "default": 0,
-          "maximum": 90,
-          "minimum": 0,
-          "type": "integer"
+        {
+          "name": "Enterprise",
+          "price_id": "price_1TgHUp6WMeYkDDIu7qngCXji",
+          "amount": 99900,
+          "interval": "month"
         }
-      },
-      "required": [
-        "stripe_publishable_key",
-        "default_currency",
-        "tier_ladder"
       ],
-      "type": "object"
+      "default_currency": "usd",
+      "enable_proration": true,
+      "trial_days": 0
     },
     "isStub": false,
     "name": "billing-and-subscriptions",
