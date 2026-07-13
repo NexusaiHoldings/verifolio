@@ -114,8 +114,8 @@ function TrendChart({ series }: { series: SeriesPoint[] }) {
                   x={x + barW / 2}
                   y={H - 6}
                   textAnchor="middle"
-                  fontSize="9"
-                  fill="var(--substrate-muted)"
+                  fontSize="10"
+                  fill="var(--substrate-fg)"
                 >
                   {pt.day.slice(5)}
                 </text>
