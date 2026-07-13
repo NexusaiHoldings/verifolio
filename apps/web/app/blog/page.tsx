@@ -71,12 +71,24 @@ export default async function BlogIndexPage(): Promise<JSX.Element> {
               <h2>
                 <Link href={`/blog/${p.slug}`}>{p.title}</Link>
               </h2>
-              <p>
-                <small>
-                  {formatDate(p.published_at)} · {p.author}
-                </small>
+              <p
+                style={{
+                  fontSize: "0.85rem",
+                  color: "color-mix(in srgb, var(--substrate-fg) 78%, var(--substrate-bg))",
+                }}
+              >
+                {formatDate(p.published_at)} · {p.author}
               </p>
-              {p.description ? <p>{p.description}</p> : null}
+              {/* Guard: some publisher runs set description = title; rendering
+                  the duplicate reads as placeholder content (QA-flagged). */}
+              {p.description && p.description.trim() !== p.title.trim() ? (
+                <p>{p.description}</p>
+              ) : null}
+              <p style={{ marginBottom: 0 }}>
+                <Link href={`/blog/${p.slug}`} style={{ fontWeight: 600 }}>
+                  Read the full post →
+                </Link>
+              </p>
             </article>
           ))}
         </div>

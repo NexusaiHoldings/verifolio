@@ -1,6 +1,9 @@
 /**
  * /help/[slug] — a single KB article (substrate-lego-wiring-001 Phase 2).
- * Server-renders the article body from @nexus/support-and-help.
+ * Server-renders the article body from @nexus/support-and-help. The body is
+ * plain text with blank-line paragraph breaks — preserved via pre-line (the
+ * old version's Tailwind `whitespace-pre-wrap` was dead code, so articles
+ * rendered as a single wall of text).
  */
 import type { JSX } from "react";
 import Link from "next/link";
@@ -35,12 +38,28 @@ export default async function ArticlePage({
   if (!article) notFound();
 
   return (
-    <main className="mx-auto max-w-3xl space-y-4 px-4 py-8">
-      <Link href="/help" className="text-sm text-blue-600 underline">
-        ← Help Center
-      </Link>
-      <h1 className="text-2xl font-semibold text-gray-900">{article.title}</h1>
-      <article className="whitespace-pre-wrap leading-relaxed text-gray-800">{article.body}</article>
+    <main>
+      <nav aria-label="Breadcrumb" style={{ marginBottom: "1rem" }}>
+        <Link href="/help" style={{ fontSize: "0.9rem" }}>
+          ← Help Center
+        </Link>
+      </nav>
+      <h1 style={{ marginBottom: "1rem" }}>{article.title}</h1>
+      <article
+        style={{
+          whiteSpace: "pre-line",
+          lineHeight: 1.7,
+          maxWidth: "44rem",
+        }}
+      >
+        {article.body}
+      </article>
+      <div className="cta-band" style={{ marginTop: "2.5rem", padding: "1.5rem", maxWidth: "44rem" }}>
+        <p style={{ margin: 0 }}>
+          Still stuck? Use the support button in the corner or{" "}
+          <Link href="/support">open a ticket</Link> and we&rsquo;ll get back to you.
+        </p>
+      </div>
     </main>
   );
 }

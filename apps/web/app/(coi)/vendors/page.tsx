@@ -3,6 +3,8 @@
  *
  * Server component. Requires an authenticated session. Supports search via
  * the ?q= query param (handled server-side for SEO + accessibility).
+ * Substrate element defaults + helpers only — the app has no Tailwind
+ * (substrate-ui-baseline-001), so utility classes would be dead code.
  */
 import type { JSX } from "react";
 import Link from "next/link";
@@ -40,52 +42,53 @@ export default async function VendorsPage({
   }
 
   return (
-    <main className="mx-auto max-w-5xl space-y-6 px-4 py-8">
-      <div className="flex items-center justify-between">
+    <main>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: "1rem",
+          flexWrap: "wrap",
+        }}
+      >
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Vendors</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 style={{ marginBottom: "0.25rem" }}>Vendors</h1>
+          <p className="muted" style={{ marginTop: 0 }}>
             Contractors and service providers tracked for COI compliance.
           </p>
         </div>
-        <Link
-          href="/vendors/new"
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
+        <Link href="/vendors/new" className="btn">
           Add vendor
         </Link>
       </div>
 
       {/* Search + filter bar */}
-      <form method="GET" className="flex flex-wrap gap-3">
-        <input
-          type="text"
-          name="q"
-          defaultValue={search}
-          placeholder="Search by name, trade, or email…"
-          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
-        <select
-          name="status"
-          defaultValue={status}
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-        >
-          <option value="active">Active</option>
-          <option value="archived">Archived</option>
-          <option value="">All statuses</option>
-        </select>
-        <button
-          type="submit"
-          className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
-        >
+      <form method="GET" className="toolbar" style={{ marginTop: "1rem" }}>
+        <label htmlFor="vendor-search" style={{ display: "flex", flexDirection: "column", gap: "0.25rem", flex: 1, minWidth: 220 }}>
+          <span style={{ fontSize: "0.82rem", fontWeight: 600 }}>Search vendors</span>
+          <input
+            id="vendor-search"
+            type="text"
+            name="q"
+            defaultValue={search}
+            placeholder="e.g. roofing, Acme, joe@…"
+          />
+        </label>
+        <label htmlFor="vendor-status" style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+          <span style={{ fontSize: "0.82rem", fontWeight: 600 }}>Status</span>
+          <select id="vendor-status" name="status" defaultValue={status}>
+            <option value="active">Active</option>
+            <option value="archived">Archived</option>
+            <option value="">All statuses</option>
+          </select>
+        </label>
+        <button type="submit" style={{ alignSelf: "flex-end" }}>
           Search
         </button>
         {(search || status !== "active") && (
-          <Link
-            href="/vendors"
-            className="rounded-md px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700"
-          >
-            Clear
+          <Link href="/vendors" style={{ alignSelf: "flex-end", fontSize: "0.9rem" }}>
+            Clear filters
           </Link>
         )}
       </form>
@@ -93,68 +96,79 @@ export default async function VendorsPage({
       {fetchError && (
         <div
           role="alert"
-          className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          style={{
+            border: "1px solid color-mix(in srgb, var(--substrate-danger) 40%, var(--substrate-border))",
+            background: "color-mix(in srgb, var(--substrate-danger) 8%, var(--substrate-bg))",
+            color: "var(--substrate-danger)",
+            borderRadius: "var(--substrate-radius)",
+            padding: "0.75rem 1rem",
+            marginTop: "1rem",
+          }}
         >
           {fetchError}
         </div>
       )}
 
       {vendors.length === 0 && !fetchError ? (
-        <div className="rounded-md border border-gray-200 bg-gray-50 px-6 py-12 text-center text-sm text-gray-500">
-          {search
-            ? `No vendors match "${search}".`
-            : "No vendors yet. Add your first vendor to get started."}
+        <div className="empty" style={{ marginTop: "1.25rem" }}>
+          {search ? (
+            <>
+              <p style={{ marginTop: 0 }}>No vendors match &ldquo;{search}&rdquo;.</p>
+              <Link href="/vendors" className="btn secondary">
+                Clear the search
+              </Link>
+            </>
+          ) : (
+            <>
+              <p style={{ marginTop: 0 }}>
+                No vendors yet. Add the contractors and service providers who work on your
+                properties, then upload their certificates of insurance to track compliance.
+              </p>
+              <Link href="/vendors/new" className="btn">
+                Add your first vendor
+              </Link>
+            </>
+          )}
         </div>
-      ) : (
-        <div className="overflow-hidden rounded-md border border-gray-200">
-          <table className="w-full border-collapse text-sm">
-            <thead className="bg-gray-50">
+      ) : vendors.length > 0 ? (
+        <div className="card" style={{ marginTop: "1.25rem", padding: 0, overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
               <tr>
-                <th className="p-3 text-left font-medium text-gray-700">Name</th>
-                <th className="p-3 text-left font-medium text-gray-700">Trade</th>
-                <th className="p-3 text-left font-medium text-gray-700">Contact</th>
-                <th className="p-3 text-left font-medium text-gray-700">License #</th>
-                <th className="p-3 text-left font-medium text-gray-700">Status</th>
+                <th style={{ textAlign: "left", padding: "0.75rem" }}>Name</th>
+                <th style={{ textAlign: "left", padding: "0.75rem" }}>Trade</th>
+                <th style={{ textAlign: "left", padding: "0.75rem" }}>Contact</th>
+                <th style={{ textAlign: "left", padding: "0.75rem" }}>License #</th>
+                <th style={{ textAlign: "left", padding: "0.75rem" }}>Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody>
               {vendors.map((vendor) => (
-                <tr key={vendor.id} className="hover:bg-gray-50">
-                  <td className="p-3">
+                <tr key={vendor.id} style={{ borderTop: "1px solid var(--substrate-border)" }}>
+                  <td style={{ padding: "0.75rem" }}>
                     <Link
                       href={`/vendors/${encodeURIComponent(vendor.id)}`}
-                      className="font-medium text-blue-600 hover:underline"
+                      style={{ fontWeight: 600 }}
                     >
                       {vendor.name}
                     </Link>
                   </td>
-                  <td className="p-3 text-gray-700">{vendor.trade ?? "—"}</td>
-                  <td className="p-3 text-gray-700">
+                  <td style={{ padding: "0.75rem" }}>{vendor.trade ?? "—"}</td>
+                  <td style={{ padding: "0.75rem" }}>
                     {vendor.contact_email ? (
-                      <a
-                        href={`mailto:${vendor.contact_email}`}
-                        className="text-blue-500 hover:underline"
-                      >
-                        {vendor.contact_email}
-                      </a>
+                      <a href={`mailto:${vendor.contact_email}`}>{vendor.contact_email}</a>
                     ) : (
                       "—"
                     )}
                     {vendor.contact_phone && (
-                      <div className="text-xs text-gray-400">{vendor.contact_phone}</div>
+                      <div className="muted" style={{ fontSize: "0.82rem" }}>
+                        {vendor.contact_phone}
+                      </div>
                     )}
                   </td>
-                  <td className="p-3 text-gray-700">
-                    {vendor.license_number ?? "—"}
-                  </td>
-                  <td className="p-3">
-                    <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                        vendor.status === "active"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
+                  <td style={{ padding: "0.75rem" }}>{vendor.license_number ?? "—"}</td>
+                  <td style={{ padding: "0.75rem" }}>
+                    <span className={vendor.status === "active" ? "pill success" : "pill"}>
                       {vendor.status}
                     </span>
                   </td>
@@ -163,22 +177,22 @@ export default async function VendorsPage({
             </tbody>
           </table>
         </div>
-      )}
+      ) : null}
 
       {/* Pagination */}
       {vendors.length === limit && (
-        <div className="flex justify-end gap-2">
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "1rem" }}>
           {page > 1 && (
             <Link
               href={`/vendors?q=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}&page=${page - 1}`}
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+              className="btn secondary"
             >
               Previous
             </Link>
           )}
           <Link
             href={`/vendors?q=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}&page=${page + 1}`}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+            className="btn secondary"
           >
             Next
           </Link>

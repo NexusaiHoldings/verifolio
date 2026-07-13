@@ -1,7 +1,9 @@
 /**
  * /help — knowledge base index (substrate-lego-wiring-001 Phase 2).
- * Server-renders published articles from @nexus/support-and-help. Degrades to
- * a friendly empty state; the floating SupportWidget handles new tickets.
+ * Server-renders published articles from @nexus/support-and-help, grouped by
+ * category. Substrate element defaults + helpers only — no Tailwind in this
+ * app, so utility classes would be dead code (the old version's dead
+ * `justify-between` was concatenating title+category into "supportbasics").
  */
 import type { JSX } from "react";
 import Link from "next/link";
@@ -18,6 +20,16 @@ interface ArticleSummary {
   category?: string | null;
 }
 
+const CATEGORY_LABELS: Record<string, string> = {
+  basics: "Getting started",
+  vendors: "Vendors",
+  certificates: "Certificates & compliance",
+};
+
+function labelFor(category: string): string {
+  return CATEGORY_LABELS[category] ?? category.charAt(0).toUpperCase() + category.slice(1);
+}
+
 export default async function HelpPage(): Promise<JSX.Element> {
   let articles: ArticleSummary[] = [];
   try {
@@ -32,31 +44,67 @@ export default async function HelpPage(): Promise<JSX.Element> {
     articles = [];
   }
 
+  const byCategory = new Map<string, ArticleSummary[]>();
+  for (const a of articles) {
+    const key = a.category ?? "general";
+    const list = byCategory.get(key) ?? [];
+    list.push(a);
+    byCategory.set(key, list);
+  }
+
   return (
-    <main className="mx-auto max-w-3xl space-y-6 px-4 py-8">
-      <h1 className="text-2xl font-semibold text-gray-900">Help Center</h1>
+    <main>
+      <h1 style={{ marginBottom: "0.25rem" }}>Help Center</h1>
+      <p className="muted" style={{ marginTop: 0, maxWidth: "42rem" }}>
+        Guides for tracking vendor certificates of insurance with Verifolio. Can&rsquo;t find
+        what you need? Use the support button in the corner or{" "}
+        <Link href="/support">open a ticket</Link>.
+      </p>
+
       {articles.length > 0 ? (
-        <ul className="divide-y divide-gray-100 rounded border border-gray-200">
-          {articles.map((a) => (
-            <li key={a.slug}>
-              <Link
-                href={`/help/${encodeURIComponent(a.slug)}`}
-                className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
-              >
-                <span className="font-medium text-gray-900">{a.title}</span>
-                {a.category && <span className="text-xs uppercase tracking-wide text-gray-400">{a.category}</span>}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        Array.from(byCategory.entries()).map(([category, list]) => (
+          <section key={category} style={{ marginTop: "1.75rem" }}>
+            <h2 style={{ fontSize: "1.1rem", marginBottom: "0.75rem" }}>{labelFor(category)}</h2>
+            <div className="card" style={{ padding: 0 }}>
+              {list.map((a, i) => (
+                <Link
+                  key={a.slug}
+                  href={`/help/${encodeURIComponent(a.slug)}`}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: "1rem",
+                    padding: "0.85rem 1.1rem",
+                    borderTop: i > 0 ? "1px solid var(--substrate-border)" : "none",
+                    textDecoration: "none",
+                    color: "var(--substrate-fg)",
+                    fontWeight: 600,
+                  }}
+                >
+                  <span>{a.title}</span>
+                  <span aria-hidden="true" className="muted">
+                    →
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ))
       ) : (
-        <p className="text-gray-600">
-          Our knowledge base is being built out. Use the support button in the corner to ask a
-          question or open a ticket — we&apos;re here to help.
-        </p>
+        <div className="empty" style={{ marginTop: "1.25rem" }}>
+          <p style={{ marginTop: 0 }}>
+            Our knowledge base is being built out. Use the support button in the corner to ask a
+            question or open a ticket — we&rsquo;re here to help.
+          </p>
+          <Link href="/support" className="btn secondary">
+            Open a support ticket
+          </Link>
+        </div>
       )}
-      <p className="text-sm text-gray-500">
-        Need to talk to someone? <Link href="/support" className="text-blue-600 underline">View your support tickets</Link>.
+
+      <p style={{ marginTop: "2rem", fontSize: "0.9rem" }}>
+        Need to talk to someone? <Link href="/support">View your support tickets</Link>.
       </p>
     </main>
   );
